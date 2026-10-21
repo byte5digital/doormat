@@ -1,0 +1,15 @@
+{
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "build": "esbuild resources/ts/doormat.ts --bundle --format=iife --target=es2019 --minify --legal-comments=none --outfile=resources/dist/doormat.js",
+        "typecheck": "tsc --noEmit",
+        "test": "vitest run"
+    },
+    "devDependencies": {
+        "esbuild": "^0.25.0",
+        "happy-dom": "^18.0.0",
+        "typescript": "^5.9.0",
+        "vitest": "^3.2.0"
+    }
+}

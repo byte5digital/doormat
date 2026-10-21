@@ -47,7 +47,7 @@ class DoormatNotices extends Tags
     /** The script alone, for a site that writes the markup itself. */
     public function script(): string
     {
-        return '<script data-cookieconsent="ignore">'.file_get_contents(__DIR__.'/../../resources/js/doormat.js').'</script>';
+        return '<script data-cookieconsent="ignore">'.file_get_contents(__DIR__.'/../../resources/dist/doormat.js').'</script>';
     }
 
     /** @param  list<array<string, mixed>>  $notices */

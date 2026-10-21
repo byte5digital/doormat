@@ -2,26 +2,29 @@
 
 namespace Byte5\Doormat\Tests;
 
+use Statamic\Facades\Antlers;
+
 /**
- * The addon's script is plain JavaScript PHPUnit cannot run; what it pins are the
- * facts a later edit could break unnoticed: the dialog opens with show(), never in
- * the browser's top layer above a consent banner; dismissals are keyed by id and
- * version in local or session storage behind try/catch; Escape closes; nothing is
- * global.
+ * The script is TypeScript (resources/ts, tested with Vitest) compiled to resources/dist/doormat.js,
+ * which the views inline: what PHP checks is that the compiled file is there, self-contained, and
+ * what the tag prints.
  */
 class ScriptTest extends TestCase
 {
-    public function test_the_script_opens_the_dialog_without_the_top_layer_and_guards_storage(): void
+    public function test_the_compiled_script_is_self_contained_and_never_uses_the_top_layer(): void
     {
-        $script = file_get_contents(__DIR__.'/../resources/js/doormat.js');
+        $script = file_get_contents(__DIR__.'/../resources/dist/doormat.js');
 
-        $this->assertStringContainsString('.show()', $script);
+        $this->assertStringStartsWith('"use strict";(()=>{', $script);
         $this->assertStringNotContainsString('showModal', $script);
-        $this->assertStringContainsString("'doormat:' +", $script);
-        $this->assertStringContainsString('sessionStorage', $script);
-        $this->assertStringContainsString('localStorage', $script);
-        $this->assertStringContainsString('try {', $script);
-        $this->assertStringContainsString("'Escape'", $script);
-        $this->assertMatchesRegularExpression("/^\\(function \\(\\) \\{\\s*\\n\\s*'use strict';/", $script);
+        $this->assertStringNotContainsString('export ', $script);
+        $this->assertStringContainsString('doormat:', $script);
+    }
+
+    public function test_the_tag_prints_the_compiled_script(): void
+    {
+        $compiled = trim(file_get_contents(__DIR__.'/../resources/dist/doormat.js'));
+
+        $this->assertStringContainsString($compiled, (string) Antlers::parse('{{ doormat_notices:script }}', [], true));
     }
 }
