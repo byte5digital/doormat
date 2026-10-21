@@ -134,3 +134,7 @@ push and pull request. Rector skips the console command attributes, which need L
 Releases are made by release-please from the conventional commits on `main`: it keeps a release pull
 request with the changelog open; merging it tags the version Composer installs.
 
+
+## License
+
+GPL-3.0-or-later, see [LICENSE](LICENSE).

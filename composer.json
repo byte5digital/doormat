@@ -9,7 +9,7 @@
         "announcements",
         "modal"
     ],
-    "license": "proprietary",
+    "license": "GPL-3.0-or-later",
     "authors": [
         {
             "name": "byte5 digital media GmbH",
