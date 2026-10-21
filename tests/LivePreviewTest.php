@@ -25,13 +25,24 @@ use Statamic\Facades\User;
  */
 class LivePreviewTest extends TestCase
 {
-    protected function getEnvironmentSetUp($app)
+    /**
+     * An application that limits the classes a cached value may unserialize into (Laravel 13), set
+     * where a real application has it: in its configuration, loaded before any provider registers.
+     */
+    protected function resolveApplicationConfiguration($app)
     {
-        parent::getEnvironmentSetUp($app);
+        parent::resolveApplicationConfiguration($app);
 
-        // An application that limits the classes a cached value may unserialize into (Laravel 13).
         $app['config']->set('cache.serializable_classes', []);
+
+        // The list as the providers' boot sees it - when a cache store built during boot reads it once.
+        $app->booting(function ($app): void {
+            self::$classesAtBoot = $app['config']->get('cache.serializable_classes');
+        });
     }
+
+    /** @var array<int, string>|null */
+    private static ?array $classesAtBoot = null;
 
     protected function setUp(): void
     {
@@ -223,5 +234,15 @@ class LivePreviewTest extends TestCase
     public function test_the_notices_class_may_come_back_from_a_cache_that_limits_its_classes(): void
     {
         $this->assertContains(Notice::class, config('cache.serializable_classes'));
+    }
+
+    /**
+     * The class is on the list before any provider boots: a cache store resolved during boot reads the
+     * list once, and a class added in bootAddon() came back as an incomplete object (found on a site
+     * with the eloquent driver, whose boot resolves the cache).
+     */
+    public function test_the_notices_class_is_listed_before_the_providers_boot(): void
+    {
+        $this->assertContains(Notice::class, self::$classesAtBoot ?? []);
     }
 }
