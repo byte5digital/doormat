@@ -1,17 +1,18 @@
 import { useBars } from './composables/useBars';
 import { useDialog } from './composables/useDialog';
 import { useDismissals } from './composables/useDismissals';
-import { fromElement } from './types';
+import { fromElement, isPreview } from './types';
 
 /**
  * The script the addon's views inline (compiled to resources/dist/doormat.js): the notices the
- * visitor already closed go before anything shows, then the bars and the dialog come alive.
+ * visitor already closed go before anything shows, then the bars and the dialog come alive. A notice
+ * in live preview stays, whatever was closed before.
  */
 export function start(root: Document = document): void {
     const { isDismissed } = useDismissals();
 
     root.querySelectorAll('[data-doormat-notice]').forEach((el) => {
-        if (isDismissed(fromElement(el))) {
+        if (!isPreview(el) && isDismissed(fromElement(el))) {
             el.remove();
         }
     });

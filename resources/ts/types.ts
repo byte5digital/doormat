@@ -18,3 +18,11 @@ export function fromElement(el: Element): Dismissable {
         frequency: frequency === 'session' || frequency === 'always' ? frequency : 'once',
     };
 }
+
+/**
+ * Whether an element of the addon's views belongs to a notice's live preview (`data-doormat-preview`):
+ * the editor sees it whatever they closed before, and closing it records nothing.
+ */
+export function isPreview(el: Element): boolean {
+    return el.hasAttribute('data-doormat-preview');
+}

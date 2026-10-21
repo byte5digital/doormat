@@ -2,6 +2,7 @@
 
 namespace Byte5\Doormat;
 
+use Byte5\Doormat\Entries\Notice;
 use Byte5\Doormat\Listeners\FlushStaticCache;
 use Byte5\Doormat\Listeners\FlushStaticCacheOnSettings;
 use Illuminate\Console\Scheduling\Schedule;
@@ -27,6 +28,18 @@ class ServiceProvider extends AddonServiceProvider
         EntryDeleted::class => [FlushStaticCache::class],
         AddonSettingsSaved::class => [FlushStaticCacheOnSettings::class],
     ];
+
+    /**
+     * Live preview keeps the previewed entry in the cache. Where the application limits the classes a
+     * cached value may unserialize into, the notices' entry class must be on that list - and before the
+     * cache store is built, which reads the list once: in register(), not in bootAddon().
+     */
+    public function register(): void
+    {
+        parent::register();
+
+        $this->registerSerializableClasses([Notice::class]);
+    }
 
     public function bootAddon(): void
     {

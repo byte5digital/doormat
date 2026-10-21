@@ -24,6 +24,7 @@ them:
 | `data-doormat-dialog`, `-delay` | the `<dialog>` | The dialog and its delay in seconds |
 | `data-doormat-prev`, `-next`, `-counter`, `-dots`, `-footer`, `-close` | the dialog's controls | Paging and closing; `-format` on the counter and dots holds "Notice :current of :total" |
 | `data-doormat-backdrop` | the overlay | A click closes the dialog |
+| `data-doormat-preview` | the `<dialog>` and each notice, on a live preview | Opens at once, ignores and records no dismissal |
 
 ## The endpoint
 
@@ -47,7 +48,7 @@ GET /!/doormat/notices?site=de
             "frequency": "once"
         }
     ],
-    "meta": { "view": "modal", "delay": 0 }
+    "meta": { "view": "modal", "delay": 0, "preview": false }
 }
 ```
 
@@ -66,8 +67,9 @@ GET /!/doormat/notices?site=de
 | `frequency` | `once` / `session` / `always` | How a closed notice comes back |
 
 `data` is ordered: the pinned notice first, then the newest. `meta.view` is the settings page's
-presentation (`modal` or `notice`), `meta.delay` the seconds the dialog waits (0: none). An empty `data`
-means nothing to show - none is live, or the settings switched notices off.
+presentation (`modal` or `notice`), `meta.delay` the seconds the dialog waits (0: none), `meta.preview`
+whether the request carried a notice's live-preview token ([Live preview](#live-preview)). An empty
+`data` means nothing to show - none is live, or the settings switched notices off.
 
 ## The dismissal rules
 
@@ -82,6 +84,27 @@ A closed notice is remembered in the browser under the key `doormat:<id>:<versio
 Storage can be blocked (private mode, a policy); then nothing is remembered and every notice shows. Do
 not write these rules yourself: import them from the package, as below, so your frontend and the tag
 agree.
+
+## Live preview
+
+An editor editing a notice clicks **Live Preview** and sees it, unsaved changes included, on a page of
+the site as a visitor would: the dialog or the bar, in the notice's language. The page is the settings
+page's `preview_page` in the notice's language, else that language's homepage. It needs the two keys of
+[the collection file](configuration.md#the-collection-file).
+
+Statamic loads that page as `?live-preview=…&token=…`. While the token is the live preview of a notice,
+the tag and the endpoint show that notice alone - whatever its dates, its published state or the master
+switch - and nothing else. A missing, expired or unrelated token (one of another entry) changes nothing.
+
+**With the tag** there is nothing to do: on the preview page it renders the notice marked
+`data-doormat-preview`, and the script opens it at once, whatever the editor closed before, and records
+no dismissal. Views published before 0.3 keep working but honour dismissals and the delay until they
+carry the attribute (compare the shipped views). A pair's own markup asks `{{ doormat_notices:preview }}`.
+
+**With a frontend of its own**, the script forwards the page's `token` to the endpoint (as the `token`
+parameter or the `X-Statamic-Token` header) and, while `meta.preview` is true, shows what it gets without
+filtering by its dismissals and without remembering the close. `meta.delay` is 0 then. The component
+below does both.
 
 ## Building your own Vue component
 
@@ -161,6 +184,7 @@ const index = ref(0);
 const open = ref(false);
 const dialog = ref<HTMLDialogElement | null>(null);
 let timer = 0;
+let preview = false; // a live preview: show the notice whatever was closed, remember nothing
 
 // "Bars" shows every notice as a bar; the dialog presentation only those that cannot be closed.
 const bars = computed(() => (view.value === 'notice' ? notices.value : notices.value.filter((n) => !n.dismissible)));
@@ -168,14 +192,22 @@ const inDialog = computed(() => (view.value === 'notice' ? [] : notices.value.fi
 const current = computed(() => inDialog.value[index.value] ?? null);
 
 onMounted(async () => {
-    const response = await fetch(`/!/doormat/notices?site=${encodeURIComponent(props.site)}`, { headers: { Accept: 'application/json' } });
+    // On a live preview Statamic adds ?token=…; forwarding it makes the endpoint answer the previewed notice.
+    const params = new URLSearchParams({ site: props.site });
+    const token = new URLSearchParams(window.location.search).get('token');
+    if (token) {
+        params.set('token', token);
+    }
+
+    const response = await fetch(`/!/doormat/notices?${params}`, { headers: { Accept: 'application/json' } });
     if (!response.ok) {
         return; // no notices; the page works without them
     }
 
     const { data, meta } = await response.json();
     view.value = meta?.view === 'notice' ? 'notice' : 'modal';
-    notices.value = data.filter((notice: Notice) => !isDismissed(notice));
+    preview = meta?.preview === true;
+    notices.value = preview ? data : data.filter((notice: Notice) => !isDismissed(notice));
 
     if (inDialog.value.length > 0) {
         timer = window.setTimeout(openDialog, Math.max(0, meta?.delay ?? 0) * 1000);
@@ -198,13 +230,17 @@ async function openDialog() {
 }
 
 function close() {
-    inDialog.value.forEach(remember); // closing dismisses every notice the dialog held
+    if (!preview) {
+        inDialog.value.forEach(remember); // closing dismisses every notice the dialog held
+    }
     open.value = false;
     document.removeEventListener('keydown', onKeydown);
 }
 
 function closeBar(notice: Notice) {
-    remember(notice);
+    if (!preview) {
+        remember(notice);
+    }
     notices.value = notices.value.filter((other) => other.id !== notice.id);
 }
 

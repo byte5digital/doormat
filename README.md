@@ -7,8 +7,8 @@ a changed phone number, a warning about delays - that visitors see when they ope
 
 - [Configuration](docs/configuration.md) - every setting: config file, settings page, the notice's fields,
   the tag's and the widget's options, commands, publish tags, permissions, translations
-- [Frontend](docs/frontend.md) - the tag, the JSON endpoint, the dismissal rules, and building your own
-  Vue component
+- [Frontend](docs/frontend.md) - the tag, the JSON endpoint, the dismissal rules, live preview, and
+  building your own Vue component
 
 ## Requirements
 
@@ -76,9 +76,17 @@ take-down time passes. The scheduler must run.
 GET /!/doormat/notices?site=<handle>
 ```
 
-answers `{"data": [...], "meta": {"view": "modal", "delay": 0}}`, each notice with `id`, `version`, `heading`, `type`, `text` (HTML), `button_label`,
+answers `{"data": [...], "meta": {"view": "modal", "delay": 0, "preview": false}}`, each notice with `id`, `version`, `heading`, `type`, `text` (HTML), `button_label`,
 `button_url`, `pinned`, `dismissible`, `frequency`; the current site without the parameter, 404 for an
-unknown one, never cached. Keep the storage keys of the addon's script if you write your own.
+unknown one, never cached. Keep the storage keys of the addon's script if you write your own, and see
+[Live preview](docs/frontend.md#live-preview) for the one parameter a site's script forwards.
+
+## Live preview
+
+**Live Preview** on a notice shows it, unsaved changes included, on a page of the site as a visitor
+would see it - the settings page picks the page, else the homepage. The collection file `doormat:install`
+writes enables it; an installation from before 0.3 adds two keys to its collection file, and a site with
+its own frontend forwards the page's `token`. See [Frontend](docs/frontend.md#live-preview).
 
 ## In the control panel
 
@@ -89,7 +97,8 @@ unknown one, never cached. Keep the storage keys of the addon's script if you wr
   language.
 - **The settings page** (Tools > Add-ons > Doormat; the `edit byte5/doormat settings` permission):
   a master switch that keeps every notice off the site, the presentation (dialog or bars; required while
-  the switch is on; until the settings are first saved the config file's `view` applies) and whether the dialog waits - "No wait" or "Wait" with a number of seconds - before it opens. Saving it flushes the static
+  the switch is on; until the settings are first saved the config file's `view` applies), whether the dialog waits - "No wait" or "Wait" with a number of seconds - before it opens,
+  and the page a notice's live preview opens on (empty: the homepage). Saving it flushes the static
   cache. The endpoint hands the presentation and the delay to a site's own script as `meta`.
 
 ## Dashboard widget

@@ -23,6 +23,11 @@ function page(sections: string, bars = '', delay = 0): void {
         </dialog>`;
 }
 
+/** Marks the page's notices and dialog as the tag does in a notice's live preview. */
+function asPreview(): void {
+    document.querySelectorAll('[data-doormat-notice], [data-doormat-dialog]').forEach((el) => el.setAttribute('data-doormat-preview', ''));
+}
+
 const visible = () => Array.from(document.querySelectorAll<HTMLElement>('dialog [data-doormat-notice]')).filter((n) => !n.hidden).map((n) => n.textContent);
 
 describe('the addon script', () => {
@@ -120,5 +125,36 @@ describe('the addon script', () => {
         document.querySelector<HTMLButtonElement>('.doormat-bar [data-doormat-close]')!.click();
         expect(document.querySelectorAll('.doormat-bar')).toHaveLength(1);
         expect(localStorage.getItem('doormat:x:1')).toBe('1');
+    });
+
+    it('opens a live preview at once, whatever the visitor closed and the delay, and remembers nothing', () => {
+        vi.useFakeTimers();
+        localStorage.setItem('doormat:a:1', '1');
+        page(notice('a', 'Preview'), '', 3);
+        asPreview();
+
+        start();
+
+        expect(document.querySelector('dialog')!.open).toBe(true);
+        expect(visible()).toEqual(['Preview']);
+
+        localStorage.clear();
+        document.querySelector<HTMLButtonElement>('dialog > [data-doormat-close]')!.click();
+        expect(document.querySelector('dialog')).toBeNull();
+        expect(localStorage.getItem('doormat:a:1')).toBeNull();
+    });
+
+    it('keeps a previewed bar the visitor closed before and closes it without remembering', () => {
+        sessionStorage.setItem('doormat:x:1', '1');
+        page('', notice('x', 'Preview', 'session', true, 'div'));
+        asPreview();
+
+        start();
+        expect(document.querySelectorAll('.doormat-bar')).toHaveLength(1);
+
+        sessionStorage.clear();
+        document.querySelector<HTMLButtonElement>('.doormat-bar [data-doormat-close]')!.click();
+        expect(document.querySelectorAll('.doormat-bar')).toHaveLength(0);
+        expect(sessionStorage.getItem('doormat:x:1')).toBeNull();
     });
 });

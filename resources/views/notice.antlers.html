@@ -1,10 +1,11 @@
 {{#
     Doormat: the notices as bars at the top of the page. A notice the visitor may close has a
     close button; the others stay until an editor takes them down. The data attributes are
-    what the script reads - keep them when you publish and restyle this view.
+    what the script reads - keep them when you publish and restyle this view; `data-doormat-preview`
+    (a notice's live preview) keeps a bar the visitor closed before and records no dismissal.
 #}}
 {{ notices }}
-<div class="doormat-bar doormat-bar--{{ type | sanitize }}" role="region" aria-label="{{ heading | sanitize }}" data-doormat-notice data-doormat-id="{{ id | sanitize }}" data-doormat-version="{{ version }}" data-doormat-frequency="{{ frequency | sanitize }}" data-doormat-dismissible="{{ if dismissible }}true{{ else }}false{{ /if }}">
+<div class="doormat-bar doormat-bar--{{ type | sanitize }}" role="region" aria-label="{{ heading | sanitize }}" data-doormat-notice data-doormat-id="{{ id | sanitize }}" data-doormat-version="{{ version }}" data-doormat-frequency="{{ frequency | sanitize }}" data-doormat-dismissible="{{ if dismissible }}true{{ else }}false{{ /if }}"{{ if preview }} data-doormat-preview{{ /if }}>
     <div class="doormat-bar__body">
         <strong class="doormat-bar__heading">{{ heading | sanitize }}</strong>
         <div class="doormat-bar__text">{{ text }}</div>
