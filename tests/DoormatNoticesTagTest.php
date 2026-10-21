@@ -92,6 +92,19 @@ class DoormatNoticesTagTest extends TestCase
         $this->assertSame(1, substr_count($markup, 'data-doormat-close'));
     }
 
+    public function test_the_script_is_printed_once_whatever_the_notices_are(): void
+    {
+        $script = '<script data-cookieconsent="ignore">';
+
+        $this->notice('de', ['heading' => 'Stay', 'dismissible' => false]);
+        $this->assertSame(1, substr_count($this->render('{{ doormat_notices }}'), $script), 'bars alone in the modal view');
+
+        $this->notice('de', ['heading' => 'Go']);
+        Blink::forget('doormat.active.de');
+        $this->assertSame(1, substr_count($this->render('{{ doormat_notices }}'), $script), 'bars and a dialog');
+        $this->assertSame(1, substr_count($this->render('{{ doormat_notices view="notice" }}'), $script), 'the notice view');
+    }
+
     public function test_an_unknown_view_falls_back_to_the_modal(): void
     {
         $this->notice('de');

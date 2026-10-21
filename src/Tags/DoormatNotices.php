@@ -50,7 +50,7 @@ class DoormatNotices extends Tags
         if ($view === 'modal') {
             $fixed = array_values(array_filter($notices, fn (array $notice): bool => ! $notice['dismissible']));
             $notices = array_values(array_filter($notices, fn (array $notice): bool => (bool) $notice['dismissible']));
-            $bars = $fixed === [] ? '' : $this->view('notice', $fixed, '');
+            $bars = $fixed === [] ? '' : $this->view('notice', $fixed, '', script: false);
         }
 
         return $this->view($view, $notices, $bars);
@@ -68,15 +68,20 @@ class DoormatNotices extends Tags
         return '<script data-cookieconsent="ignore">'.file_get_contents(__DIR__.'/../../resources/dist/doormat.js').'</script>';
     }
 
-    /** @param  list<array<string, mixed>>  $notices */
-    private function view(string $view, array $notices, string $bars): string
+    /**
+     * The view, with the script unless `$script` is false: the modal's bars are rendered without
+     * it, since the modal prints it - or, with no dialog to show, the bars get it here.
+     *
+     * @param  list<array<string, mixed>>  $notices
+     */
+    private function view(string $view, array $notices, string $bars, bool $script = true): string
     {
         if ($notices === []) {
-            return $bars;
+            return $bars === '' ? '' : $bars.$this->script();
         }
 
         $preview = $this->preview();
-        $data = ['notices' => $notices, 'bars' => $bars, 'script' => $this->script(), 'delay' => $preview ? 0 : Settings::delay(), 'preview' => $preview];
+        $data = ['notices' => $notices, 'bars' => $bars, 'script' => $script ? $this->script() : '', 'delay' => $preview ? 0 : Settings::delay(), 'preview' => $preview];
 
         return View::make('doormat::'.$view, $data)->render();
     }
