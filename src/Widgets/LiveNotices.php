@@ -15,8 +15,9 @@ use Statamic\Widgets\Widget;
 
 /**
  * The dashboard's "Doormat" card, a Vue component on Statamic's own widget (resources/js): per language the notices live there right now, or that none is.
- * Add it in config/statamic/cp.php: 'widgets' => [['type' => 'doormat', 'width' => 50]]. Shown only to
- * a user who may view the notices.
+ * Add it in config/statamic/cp.php: 'widgets' => [['type' => 'doormat', 'width' => 50]], with
+ * 'languages' => 'active' to list only the languages that have a live notice (default 'all'). Shown only
+ * to a user who may view the notices.
  */
 class LiveNotices extends Widget
 {
@@ -47,6 +48,12 @@ class LiveNotices extends Widget
             }
 
             $any = $any || $notices !== [];
+
+            // `languages: active` lists only the languages with a live notice; `all` (the default) every one.
+            if ($notices === [] && $this->config('languages', 'all') === 'active') {
+                continue;
+            }
+
             $sites[] = ['name' => $site->name(), 'notices' => $notices];
         }
 

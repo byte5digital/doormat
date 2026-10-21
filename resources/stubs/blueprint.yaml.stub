@@ -142,7 +142,7 @@ tabs:
             handle: state
             field:
               type: text
-              display: State
+              display: Status
               instructions: 'Draft, scheduled, live or taken down - worked out from the publish and take-down dates.'
               visibility: computed
               listable: true

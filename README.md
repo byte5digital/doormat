@@ -75,7 +75,7 @@ unknown one, never cached. Keep the storage keys of the addon's script if you wr
 
 ## In the control panel
 
-- **The list** shows each notice's state - Draft, Scheduled, Live or Taken down, worked out from its
+- **The list** shows each notice's status - Draft, Scheduled, Live or Taken down, worked out from its
   dates - with its type, publish and take-down date and whether it is pinned.
 - **Show again to everyone**, an action on a notice (or several), brings it back for the visitors who
   closed it without editing its text. On the origin every language returns; on a localization, that
@@ -96,6 +96,9 @@ notices. Add it in `config/statamic/cp.php`:
     ['type' => 'doormat', 'width' => 50],
 ],
 ```
+
+`'languages' => 'active'` lists only the languages that have a live notice; the default, `'all'`, lists every
+language, with "No notices active" under those without one.
 
 ## Configuration
 

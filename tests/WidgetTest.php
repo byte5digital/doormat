@@ -21,7 +21,8 @@ class WidgetTest extends TestCase
     }
 
     /** @return array<string, mixed>|null the props of the widget's Vue component, null when it shows nothing */
-    private function props(bool $super = true): ?array
+    /** @param  array<string, mixed>  $config */
+    private function props(bool $super = true, array $config = []): ?array
     {
         $user = User::make()->email('widget-'.uniqid().'@example.com');
         if ($super) {
@@ -31,7 +32,7 @@ class WidgetTest extends TestCase
         $this->actingAs($user);
 
         $widget = new LiveNotices;
-        $widget->setConfig([]);
+        $widget->setConfig($config);
         $component = $widget->component();
 
         if ($component === null) {
@@ -60,6 +61,24 @@ class WidgetTest extends TestCase
         $this->assertSame([], $props['sites'][1]['notices']);
         $this->assertSame('No notices active', $props['texts']['noneHere']);
         $this->assertStringEndsWith('/collections/doormat_notices', $props['url']);
+    }
+
+    public function test_languages_active_lists_only_the_languages_with_a_live_notice(): void
+    {
+        $this->notice('de', ['title' => 'Betriebsferien']);
+
+        $props = $this->props(config: ['languages' => 'active']);
+
+        $this->assertSame(['Deutsch'], array_column($props['sites'], 'name'));
+        $this->assertTrue($props['any']);
+    }
+
+    public function test_languages_active_says_so_when_none_is_live(): void
+    {
+        $props = $this->props(config: ['languages' => 'active']);
+
+        $this->assertSame([], $props['sites']);
+        $this->assertFalse($props['any']);
     }
 
     public function test_it_says_so_when_no_notice_is_live_anywhere(): void
