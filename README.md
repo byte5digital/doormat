@@ -22,8 +22,8 @@ update (a site that commits its published assets commits that folder).
 `doormat:install` writes the notices collection (`content/collections/doormat_notices.yaml`) and its
 blueprint (`resources/blueprints/collections/doormat_notices/notice.yaml`) into the folders the site
 configured for Statamic, with every site listed. Commit both files; an existing file is left alone
-unless `--force` is given. The collection appears under Content > Collections and as Tools > Doormat,
-for whoever may view it (Statamic's collection permissions).
+unless `--force` is given. The notices are listed under Content > Collections, for whoever may view the collection (Statamic's
+collection permissions); the settings page is under Tools > Add-ons > Doormat.
 
 ## The notices
 
@@ -80,7 +80,7 @@ unknown one, never cached. Keep the storage keys of the addon's script if you wr
 - **Show again to everyone**, an action on a notice (or several), brings it back for the visitors who
   closed it without editing its text. On the origin every language returns; on a localization, that
   language.
-- **The settings page** (Tools > Addons > Doormat, or the `edit byte5/doormat settings` permission):
+- **The settings page** (Tools > Add-ons > Doormat; the `edit byte5/doormat settings` permission):
   a master switch that keeps every notice off the site, the presentation (dialog or bars; empty means
   the config file decides) and whether the dialog waits - "No wait" or "Wait" with a number of seconds - before it opens. Saving it flushes the static
   cache. The endpoint hands the presentation and the delay to a site's own script as `meta`.
