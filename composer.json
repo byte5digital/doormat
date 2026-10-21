@@ -12,8 +12,8 @@
     "license": "GPL-3.0-or-later",
     "authors": [
         {
-            "name": "byte5 digital media GmbH",
-            "homepage": "https://www.byte5.de"
+            "name": "byte5 GmbH",
+            "email": "info@byte5.de"
         }
     ],
     "require": {

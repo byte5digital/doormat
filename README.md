@@ -2,17 +2,13 @@
 
 Site notices for Statamic: a message editors switch on in the control panel - a holiday closure,
 a changed phone number, a warning about delays - that visitors see when they open the website.
-Statamic 6, PHP 8.2 or newer.
 
-## Install
+## Requirements
 
-The package is not on Packagist. Add its repository to the site's `composer.json` and require it:
+- PHP 8.2+
+- Statamic 6.35+ (Laravel 12 or 13)
 
-```json
-"repositories": [
-    { "type": "vcs", "url": "git@github.com:byte5digital/doormat.git" }
-]
-```
+## Installation
 
 ```bash
 composer require byte5/doormat
