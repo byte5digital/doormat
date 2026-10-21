@@ -10,26 +10,27 @@ use Statamic\Contracts\Entries\Entry;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
-use Statamic\View\View;
+use Statamic\Widgets\VueComponent;
 use Statamic\Widgets\Widget;
 
 /**
- * The dashboard's "Doormat" card: per language the notices live there right now, or that none is.
- * Add it in config/statamic/cp.php: 'widgets' => [['type' => 'doormat', 'width' => 50]]. Shown only to
- * a user who may view the notices.
+ * The dashboard's "Doormat" card, a Vue component on Statamic's own widget (resources/js): per language the notices live there right now, or that none is.
+ * Add it in config/statamic/cp.php: 'widgets' => [['type' => 'doormat', 'width' => 50]], with
+ * 'languages' => 'active' to list only the languages that have a live notice (default 'all'). Shown only
+ * to a user who may view the notices.
  */
 class LiveNotices extends Widget
 {
     /** @var string */
     protected static $handle = 'doormat';
 
-    public function html(): string
+    public function component(): ?VueComponent
     {
         $collection = Collection::findByHandle(Notices::collection());
         $user = User::current();
 
         if ($collection === null || $user === null || ! $user->can('view', $collection)) {
-            return '';
+            return null;
         }
 
         $sites = [];
@@ -47,16 +48,29 @@ class LiveNotices extends Widget
             }
 
             $any = $any || $notices !== [];
+
+            // `languages: active` lists only the languages with a live notice; `all` (the default) every one.
+            if ($notices === [] && $this->config('languages', 'all') === 'active') {
+                continue;
+            }
+
             $sites[] = ['name' => $site->name(), 'notices' => $notices];
         }
 
-        return View::make('doormat::widgets.live-notices', [
-            'title' => $this->config('title', 'Doormat'),
+        return VueComponent::render('doormat-live-notices-widget', [
+            'title' => __((string) $this->config('title', 'Doormat')),
+            'url' => $collection->showUrl(),
+            'enabled' => Settings::enabled(),
             'sites' => $sites,
             'any' => $any,
-            'enabled' => Settings::enabled(),
-            'listUrl' => $collection->showUrl(),
-        ])->render();
+            'texts' => [
+                'all' => __('doormat::notices.widget.all'),
+                'none' => __('doormat::notices.widget.none'),
+                'noneHere' => __('doormat::notices.widget.none_here'),
+                'pinned' => __('doormat::notices.widget.pinned'),
+                'switchedOff' => __('doormat::notices.widget.switched_off'),
+            ],
+        ]);
     }
 
     /** @return array{title: string, type: string, pinned: bool, url: string} */

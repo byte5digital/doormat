@@ -29,10 +29,10 @@ final class Settings
         return in_array($view, self::VIEWS, true) ? $view : 'modal';
     }
 
-    /** Seconds the dialog waits after the page has loaded. */
+    /** Seconds the dialog waits after the page has loaded: none while "No wait" is picked. */
     public static function delay(): int
     {
-        return max(0, (int) self::get('delay', 0));
+        return self::get('wait') === 'wait' ? max(1, (int) self::get('delay', 1)) : 0;
     }
 
     private static function get(string $key, mixed $default = null): mixed

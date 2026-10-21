@@ -6,6 +6,7 @@ use Byte5\Doormat\Actions\ShowAgain;
 use Byte5\Doormat\Settings;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 use Statamic\Facades\Addon;
 use Statamic\Facades\Antlers;
 use Statamic\Facades\Collection;
@@ -88,7 +89,7 @@ class ControlPanelTest extends TestCase
     {
         $this->notice('de');
 
-        $this->settings(['view' => 'modal', 'delay' => 3]);
+        $this->settings(['view' => 'modal', 'wait' => 'wait', 'delay' => 3]);
         $this->assertStringContainsString('data-doormat-delay="3"', $this->render('{{ doormat_notices }}'));
         $this->getJson('/!/doormat/notices?site=de')->assertJsonPath('meta.view', 'modal')->assertJsonPath('meta.delay', 3);
 
@@ -96,6 +97,25 @@ class ControlPanelTest extends TestCase
         $html = $this->render('{{ doormat_notices }}');
         $this->assertStringContainsString('doormat-bar', $html);
         $this->assertStringNotContainsString('<dialog', $html);
+    }
+
+    public function test_the_delay_is_a_choice_with_seconds(): void
+    {
+        $this->settings(['wait' => 'no_wait', 'delay' => 5]);
+        $this->assertSame(0, Settings::delay());
+
+        $this->settings(['wait' => 'wait', 'delay' => 5]);
+        $this->assertSame(5, Settings::delay());
+    }
+
+    public function test_the_seconds_are_checked_only_while_wait_is_picked(): void
+    {
+        $fields = Addon::get('byte5/doormat')->settingsBlueprint()->fields();
+
+        $fields->addValues(['wait' => 'no_wait', 'delay' => 0])->validator()->validate();
+
+        $this->expectException(ValidationException::class);
+        $fields->addValues(['wait' => 'wait', 'delay' => 0])->validator()->validate();
     }
 
     public function test_saving_the_settings_flushes_the_static_cache(): void
