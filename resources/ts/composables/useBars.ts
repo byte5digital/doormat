@@ -1,12 +1,14 @@
-import { fromElement } from '../types';
+import { fromElement, isPreview } from '../types';
 import { useDismissals } from './useDismissals';
 
-/** The bars' close buttons: a closed bar is remembered and removed. */
+/** The bars' close buttons: a closed bar is remembered - unless it is a live preview - and removed. */
 export function useBars(root: ParentNode = document) {
     const { remember } = useDismissals();
 
     function close(bar: Element): void {
-        remember(fromElement(bar));
+        if (!isPreview(bar)) {
+            remember(fromElement(bar));
+        }
         bar.remove();
     }
 

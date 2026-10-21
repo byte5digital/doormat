@@ -1,4 +1,4 @@
-import { fromElement } from '../types';
+import { fromElement, isPreview } from '../types';
 import { useDismissals } from './useDismissals';
 
 export interface DialogOptions {
@@ -12,11 +12,13 @@ export interface DialogOptions {
  * buttons, the backdrop, Escape - remembers every notice it held. It opens with show(), not
  * showModal(): a modal dialog sits in the browser's top layer above a consent banner and freezes the
  * page, so the visitor could not answer the banner. The view's data-doormat-delay waits that many
- * seconds before opening.
+ * seconds before opening. A dialog in live preview (data-doormat-preview) opens at once and closing it
+ * remembers nothing, so the editor can look again.
  */
 export function useDialog(dialog: HTMLDialogElement, options: DialogOptions = {}) {
     const { remember } = useDismissals();
     const backdrop = options.backdrop ?? null;
+    const preview = isPreview(dialog);
     const notices = Array.from(dialog.querySelectorAll<HTMLElement>('[data-doormat-notice]'));
     const prev = dialog.querySelector<HTMLButtonElement>('[data-doormat-prev]');
     const next = dialog.querySelector<HTMLButtonElement>('[data-doormat-next]');
@@ -70,7 +72,9 @@ export function useDialog(dialog: HTMLDialogElement, options: DialogOptions = {}
     }
 
     function close(): void {
-        notices.forEach((notice) => remember(fromElement(notice)));
+        if (!preview) {
+            notices.forEach((notice) => remember(fromElement(notice)));
+        }
         if (dialog.open) {
             dialog.close();
         }
@@ -121,7 +125,7 @@ export function useDialog(dialog: HTMLDialogElement, options: DialogOptions = {}
 
     render();
 
-    const delay = Number.parseInt(dialog.getAttribute('data-doormat-delay') ?? '0', 10);
+    const delay = preview ? 0 : Number.parseInt(dialog.getAttribute('data-doormat-delay') ?? '0', 10);
     if (delay > 0) {
         window.setTimeout(open, delay * 1000);
     } else {

@@ -3,5 +3,5 @@
 export { useBars } from './composables/useBars';
 export { useDialog } from './composables/useDialog';
 export { useDismissals } from './composables/useDismissals';
-export { fromElement } from './types';
+export { fromElement, isPreview } from './types';
 export type { Dismissable, Frequency } from './types';
