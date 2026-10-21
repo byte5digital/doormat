@@ -1,0 +1,152 @@
+title: Notice
+tabs:
+  main:
+    display: Notice
+    sections:
+      -
+        display: Notice
+        instructions: 'What the visitor reads. The heading and the text are per language; the name above is the same in every language.'
+        fields:
+          -
+            handle: title
+            field:
+              type: text
+              display: 'Internal name'
+              instructions: 'Names the notice in the control panel only, in every language the same, so a colleague finds the right notice whatever language they edit.'
+              localizable: false
+              validate:
+                - required
+          -
+            handle: heading
+            field:
+              type: text
+              display: Heading
+              instructions: 'The title the visitor sees.'
+              localizable: true
+              validate:
+                - required
+          -
+            handle: text
+            field:
+              type: bard
+              display: Text
+              instructions: 'The message. Keep it short: a notice is read in passing.'
+              buttons:
+                - bold
+                - italic
+                - anchor
+                - unorderedlist
+                - orderedlist
+              localizable: true
+              remove_empty_nodes: trim
+              smart_typography: true
+              validate:
+                - required
+      -
+        display: Button
+        instructions: 'An optional button under the text.'
+        fields:
+          -
+            handle: button_link
+            field:
+              type: link
+              display: Link
+              instructions: 'A page of this site or an address. Leave it empty for no button.'
+              localizable: true
+          -
+            handle: button_label
+            field:
+              type: text
+              display: 'Button text'
+              localizable: true
+              if:
+                button_link: 'not empty'
+              validate:
+                - 'required_with:button_link'
+  appearance:
+    display: Appearance
+    sections:
+      -
+        display: Type
+        fields:
+          -
+            handle: type
+            field:
+              type: button_group
+              display: Type
+              instructions: 'Decides the colour and the icon.'
+              options:
+                info: Info
+                success: Success
+                warning: Warning
+                error: Error
+              default: info
+              localizable: false
+  settings:
+    display: Settings
+    sections:
+      -
+        display: Behaviour
+        instructions: 'How the notice behaves for the visitor. One decision for every language.'
+        fields:
+          -
+            handle: pinned
+            field:
+              type: toggle
+              display: Pinned
+              instructions: 'The pinned notice comes first. Only one notice can be pinned at a time.'
+              default: false
+              localizable: false
+              width: 33
+              validate:
+                - 'new \Byte5\Doormat\Rules\OnePinned({id})'
+          -
+            handle: dismissible
+            field:
+              type: toggle
+              display: Dismissible
+              instructions: 'Off, the visitor cannot close the notice; it stays until it is taken down.'
+              default: true
+              localizable: false
+              width: 33
+          -
+            handle: frequency
+            field:
+              type: select
+              display: 'Shows again'
+              instructions: 'How often a visitor who closed the notice sees it again.'
+              options:
+                once: 'Never: once per visitor'
+                session: 'Once per browser session'
+                always: 'On every page until closed'
+              default: once
+              localizable: false
+              always_save: true
+              width: 33
+              if:
+                dismissible: 'equals true'
+  sidebar:
+    display: Sidebar
+    sections:
+      -
+        fields:
+          -
+            handle: date
+            field:
+              type: date
+              display: 'Publish date'
+              instructions: 'The notice shows from this date and time; before it, it stays off the site.'
+              time_enabled: true
+              localizable: false
+              validate:
+                - required
+          -
+            handle: expires_at
+            field:
+              type: date
+              display: 'Take-down date'
+              instructions: 'From this date and time the notice is gone. Leave it empty to take it down by hand.'
+              time_enabled: true
+              localizable: false
+              validate:
+                - 'after:date'

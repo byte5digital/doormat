@@ -1,0 +1,68 @@
+{{#
+    Doormat: the notices a visitor may close in a dialog, one at a time with previous and next;
+    the ones they may not close come first as bars (`bars`, the notice view rendered). The dialog
+    is opened by the script with show(), under a consent banner's z-index (--doormat-z-index),
+    never in the browser's top layer. The data attributes are what the script reads - keep them
+    when you publish and restyle this view.
+#}}
+{{ bars }}
+<div class="doormat-backdrop" data-doormat-backdrop hidden></div>
+<dialog class="doormat-dialog" data-doormat-dialog aria-label="{{ trans key='doormat::notices.notices' }}">
+    <div class="doormat-dialog__position" data-doormat-counter data-doormat-format="{{ trans key='doormat::notices.position' }}"></div>
+    <button type="button" class="doormat-dialog__close" data-doormat-close aria-label="{{ trans key='doormat::notices.close' }}">
+        <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg>
+    </button>
+    {{ notices }}
+    <section class="doormat-notice doormat-notice--{{ type | sanitize }}" data-doormat-notice data-doormat-id="{{ id | sanitize }}" data-doormat-version="{{ version }}" data-doormat-frequency="{{ frequency | sanitize }}" data-doormat-dismissible="{{ if dismissible }}true{{ else }}false{{ /if }}" hidden>
+        <div class="doormat-notice__icon">
+            <svg aria-hidden="true" width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="{{ if type == 'warning' }}M12 3.5L2.5 20h19z M12 10v4.5 M12 17.5h.01{{ elseif type == 'error' }}M8.2 3h7.6L21 8.2v7.6L15.8 21H8.2L3 15.8V8.2z M9 9l6 6 M15 9l-6 6{{ elseif type == 'success' }}M12 3a9 9 0 1 0 0 18a9 9 0 1 0 0-18z M8 12.5l2.7 2.7L16 9.5{{ else }}M12 3a9 9 0 1 0 0 18a9 9 0 1 0 0-18z M12 16v-5 M12 8h.01{{ /if }}"></path></svg>
+        </div>
+        <div class="doormat-notice__type">{{ trans :key="'doormat::notices.types.' + type" }}</div>
+        <h2 class="doormat-notice__heading">{{ heading | sanitize }}</h2>
+        <div class="doormat-notice__text">{{ text }}</div>
+        {{ if button_url }}<a class="doormat-notice__button" href="{{ button_url | sanitize }}">{{ button_label | sanitize }}</a>{{ /if }}
+    </section>
+    {{ /notices }}
+    <footer class="doormat-dialog__footer" data-doormat-footer>
+        <button type="button" class="doormat-dialog__nav" data-doormat-prev aria-label="{{ trans key='doormat::notices.previous' }}">
+            <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"></path></svg>
+        </button>
+        <div class="doormat-dialog__dots" data-doormat-dots data-doormat-format="{{ trans key='doormat::notices.position' }}"></div>
+        <button type="button" class="doormat-dialog__nav doormat-dialog__nav--next" data-doormat-next aria-label="{{ trans key='doormat::notices.next' }}">
+            <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"></path></svg>
+        </button>
+    </footer>
+</dialog>
+<style>
+    :root { --doormat-z-index: 1000; --doormat-accent: #B400B4; --doormat-max-width: 80rem; --doormat-shadow: 0 1.5rem 3.75rem rgba(0, 0, 0, .28); }
+    .doormat-backdrop { position: fixed; inset: 0; z-index: var(--doormat-z-index); background: rgba(29, 29, 27, .55); }
+    .doormat-dialog { position: fixed; inset: 0; z-index: calc(var(--doormat-z-index) + 1); display: none; width: calc(100% - 1.25rem); max-width: var(--doormat-max-width); max-height: calc(100% - 3rem); margin: auto; padding: 2.75rem 1.25rem 1.25rem; overflow: auto; border: 0; border-radius: .75rem; box-shadow: var(--doormat-shadow); font: 300 1rem/1.5 'Helvetica Neue', Helvetica, Roboto, Arial, sans-serif; color: #1d1d1b; background: #fff; text-align: center; }
+    @media (min-width: 40em) { .doormat-dialog { width: calc(100% - 3.75rem); padding: 3rem 2.5rem 1.5rem; } }
+    .doormat-dialog[open] { display: block; }
+    .doormat-dialog:focus { outline: 0; }
+    .doormat-notice { display: flex; flex-direction: column; align-items: center; gap: .875rem; --deep: #8a008a; --tint: #fbe6fb; }
+    .doormat-notice[hidden] { display: none; }
+    .doormat-notice--success { --deep: #1d7a43; --tint: #e9f9ef; }
+    .doormat-notice--warning { --deep: #8a5a00; --tint: #fff4d9; }
+    .doormat-notice--error { --deep: #a33a29; --tint: #fbecea; }
+    .doormat-notice__icon { display: flex; align-items: center; justify-content: center; width: 4.5rem; height: 4.5rem; margin-bottom: .25rem; border-radius: 50%; color: var(--deep); background: var(--tint); }
+    .doormat-notice__type { font-size: .75rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--deep); }
+    .doormat-notice__heading { max-width: 46rem; margin: 0; font-size: 1.625rem; font-weight: 400; line-height: 1.2; }
+    .doormat-notice__text { max-width: 46rem; font-size: .9375rem; line-height: 1.6; color: #626262; }
+    .doormat-notice__text p { margin: 0 0 .5rem; }
+    .doormat-notice__text p:last-child { margin-bottom: 0; }
+    .doormat-notice__button { display: inline-flex; align-items: center; min-height: 2.75rem; margin-top: .5rem; padding: 0 1.5rem; border-radius: 1.375rem; background: var(--doormat-accent); color: #fff; font-size: .9375rem; text-decoration: none; }
+    .doormat-dialog__position { position: absolute; top: 1.5rem; left: 1.75rem; font-size: .8125rem; color: #626262; }
+    .doormat-dialog__close { position: absolute; top: .75rem; right: .75rem; display: flex; align-items: center; justify-content: center; width: 2.75rem; height: 2.75rem; border: 0; background: none; color: #626262; cursor: pointer; }
+    .doormat-dialog__footer { display: flex; align-items: center; justify-content: space-between; margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid #e5e5e5; }
+    .doormat-dialog__footer[hidden] { display: none; }
+    .doormat-dialog__nav { display: flex; align-items: center; justify-content: center; width: 2.75rem; height: 2.75rem; border: 1px solid #e5e5e5; border-radius: 50%; background: #fff; color: #1d1d1b; cursor: pointer; }
+    .doormat-dialog__nav--next:not(:disabled) { border-color: #1d1d1b; background: #1d1d1b; color: #fff; }
+    .doormat-dialog__nav:disabled { color: #c4c4c4; cursor: default; }
+    .doormat-dialog__nav--next:disabled { border-color: #e5e5e5; background: #e5e5e5; color: #a7a7a7; }
+    .doormat-dialog__dots { display: flex; align-items: center; gap: .125rem; }
+    .doormat-dialog__dot { display: flex; align-items: center; justify-content: center; width: 1.75rem; height: 1.75rem; padding: 0; border: 0; background: none; cursor: pointer; }
+    .doormat-dialog__dot span { width: .5rem; height: .5rem; border-radius: .25rem; background: #dadada; transition: width .15s; }
+    .doormat-dialog__dot--current span { width: 1.375rem; background: var(--doormat-accent); }
+</style>
+{{ script }}

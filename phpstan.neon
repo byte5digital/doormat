@@ -1,0 +1,15 @@
+includes:
+    - ./vendor/larastan/larastan/extension.neon
+
+parameters:
+    level: 7
+    # The addon's floor: code newer than PHP 8.2 (a typed class constant, ...) is reported.
+    phpVersion: 80200
+    paths:
+        - src/
+        - routes/
+    ignoreErrors:
+        # Statamic's contracts (Entry, QueryBuilder, ...) are empty marker interfaces; the methods the
+        # facades hand out live on the implementations.
+        -
+            message: '#^Call to an undefined method Statamic\\Contracts\\#'

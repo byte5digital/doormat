@@ -1,0 +1,28 @@
+{{#
+    Doormat: the notices as bars at the top of the page. A notice the visitor may close has a
+    close button; the others stay until an editor takes them down. The data attributes are
+    what the script reads - keep them when you publish and restyle this view.
+#}}
+{{ notices }}
+<div class="doormat-bar doormat-bar--{{ type | sanitize }}" role="region" aria-label="{{ heading | sanitize }}" data-doormat-notice data-doormat-id="{{ id | sanitize }}" data-doormat-version="{{ version }}" data-doormat-frequency="{{ frequency | sanitize }}" data-doormat-dismissible="{{ if dismissible }}true{{ else }}false{{ /if }}">
+    <div class="doormat-bar__body">
+        <strong class="doormat-bar__heading">{{ heading | sanitize }}</strong>
+        <div class="doormat-bar__text">{{ text }}</div>
+        {{ if button_url }}<a class="doormat-notice__button" href="{{ button_url | sanitize }}">{{ button_label | sanitize }}</a>{{ /if }}
+    </div>
+    {{ if dismissible }}<button type="button" class="doormat-bar__close" data-doormat-close aria-label="{{ trans key='doormat::notices.close' }}">&times;</button>{{ /if }}
+</div>
+{{ /notices }}
+<style>
+    .doormat-bar { display: flex; align-items: flex-start; gap: 1rem; padding: .75rem 1rem; font: 1rem/1.4 system-ui, sans-serif; color: #1f2937; background: #f3f4f6; border-left: .375rem solid #6b7280; }
+    .doormat-bar--info { border-left-color: #2563eb; background: #eff6ff; }
+    .doormat-bar--success { border-left-color: #16a34a; background: #f0fdf4; }
+    .doormat-bar--warning { border-left-color: #d97706; background: #fffbeb; }
+    .doormat-bar--error { border-left-color: #dc2626; background: #fef2f2; }
+    .doormat-bar__body { flex: 1 1 auto; min-width: 0; }
+    .doormat-bar__heading { display: block; margin-bottom: .125rem; }
+    .doormat-bar__text p { margin: 0; }
+    .doormat-notice__button { display: inline-block; margin-top: .5rem; padding: .375rem .75rem; color: #fff; background: #1f2937; border-radius: .25rem; text-decoration: none; }
+    .doormat-bar__close { flex: 0 0 auto; border: 0; background: none; font-size: 1.5rem; line-height: 1; cursor: pointer; color: inherit; }
+</style>
+{{ script }}

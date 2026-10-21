@@ -1,0 +1,72 @@
+{
+    "name": "byte5/doormat",
+    "description": "A message the editors switch on, shown to a visitor once on the first page they open.",
+    "type": "statamic-addon",
+    "keywords": [
+        "statamic",
+        "statamic-addon",
+        "notices",
+        "announcements",
+        "modal"
+    ],
+    "license": "proprietary",
+    "authors": [
+        {
+            "name": "byte5 digital media GmbH",
+            "homepage": "https://www.byte5.de"
+        }
+    ],
+    "require": {
+        "php": "^8.2",
+        "statamic/cms": "^6.35"
+    },
+    "require-dev": {
+        "orchestra/testbench": "^10.8 || ^11.0",
+        "laravel/pint": "^1.0",
+        "larastan/larastan": "^3.9",
+        "rector/rector": "^2.3",
+        "driftingly/rector-laravel": "^2.2"
+    },
+    "autoload": {
+        "psr-4": {
+            "Byte5\\Doormat\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Byte5\\Doormat\\Tests\\": "tests"
+        }
+    },
+    "scripts": {
+        "test": "phpunit",
+        "lint": "pint",
+        "lint:check": "pint --test",
+        "stan": "phpstan analyse --memory-limit=1G",
+        "rector": "rector process",
+        "rector:check": "rector process --dry-run",
+        "check": [
+            "@lint:check",
+            "@stan",
+            "@rector:check",
+            "@test"
+        ]
+    },
+    "config": {
+        "allow-plugins": {
+            "pixelfear/composer-dist-plugin": true
+        }
+    },
+    "extra": {
+        "statamic": {
+            "name": "Doormat",
+            "description": "A message the editors switch on, shown to a visitor once on the first page they open"
+        },
+        "laravel": {
+            "providers": [
+                "Byte5\\Doormat\\ServiceProvider"
+            ]
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}

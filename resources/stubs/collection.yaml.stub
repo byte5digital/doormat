@@ -1,0 +1,12 @@
+title: 'Doormat notices'
+sites:
+{{ sites }}
+propagate: false
+slugs: false
+date: true
+sort_dir: desc
+date_behavior:
+  past: public
+  future: private
+inject:
+  seo: false
