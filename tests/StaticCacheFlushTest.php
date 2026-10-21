@@ -24,7 +24,7 @@ class StaticCacheFlushTest extends TestCase
     {
         return Entry::make()->id((string) Str::uuid())->collection($collection)->locale('de')
             ->slug('notice-'.Str::lower(Str::random(6)))->date($date)->published(true)
-            ->data($data + ['title' => 'Flush probe', 'heading' => 'Heading', 'type' => 'info']);
+            ->data($data + ['title' => 'Flush probe', 'heading' => 'Heading', 'notice_type' => 'info']);
     }
 
     public function test_saving_a_notice_flushes_the_static_cache(): void

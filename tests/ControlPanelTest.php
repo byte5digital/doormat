@@ -13,6 +13,7 @@ use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Site;
 use Statamic\Facades\StaticCache;
+use Statamic\Facades\User;
 
 /**
  * What an editor works with in the control panel: the list's State column, the addon's
@@ -60,10 +61,22 @@ class ControlPanelTest extends TestCase
         $fields = Collection::findByHandle('doormat_notices')->entryBlueprint()->fields()->all();
         $listable = $fields->filter(fn ($field) => $field->isListable())->keys()->all();
 
-        foreach (['title', 'state', 'type', 'date', 'expires_at', 'pinned'] as $handle) {
+        foreach (['title', 'state', 'notice_type', 'date', 'expires_at', 'pinned'] as $handle) {
             $this->assertContains($handle, $listable, $handle);
         }
         $this->assertNotContains('text', $listable);
+    }
+
+    /** Statamic's entry list answers a column named `type` with the collection's title, whatever the field holds. */
+    public function test_the_list_shows_the_notice_type_by_its_label(): void
+    {
+        $this->notice('de', ['notice_type' => 'warning']);
+        $editor = tap(User::make()->email('lister@example.com')->makeSuper())->save();
+
+        $this->actingAs($editor)
+            ->getJson(cp_route('collections.entries.index', 'doormat_notices').'?site=de&columns=title,notice_type')
+            ->assertOk()
+            ->assertJsonPath('data.0.notice_type', ['Warning']);
     }
 
     public function test_the_settings_default_to_on_the_config_and_no_delay(): void

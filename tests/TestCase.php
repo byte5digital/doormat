@@ -75,7 +75,7 @@ abstract class TestCase extends AddonTestCase
         $entry = Entry::make()->id((string) Str::uuid())->collection(Notices::collection())->locale($site)
             ->date($date ?? Carbon::now()->subDay())->published($published)
             ->data($data + [
-                'title' => 'Test notice', 'heading' => 'Heading', 'type' => 'info',
+                'title' => 'Test notice', 'heading' => 'Heading', 'notice_type' => 'info',
                 'text' => [['type' => 'paragraph', 'content' => [['type' => 'text', 'text' => 'Body']]]],
             ]);
         // As the control panel saves: the last change is recorded, which is the notice's version.

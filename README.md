@@ -32,6 +32,14 @@ configured for Statamic, with every site listed. Commit both files; an existing 
 unless `--force` is given. The notices are listed under Content > Collections, for whoever may view the collection (Statamic's
 collection permissions); the settings page is under Tools > Add-ons > Doormat.
 
+### Upgrading to 0.4
+
+The type field is `notice_type` now, in the blueprint and in what the tag and the endpoint hand out - Statamic's
+entry list answers a column named `type` with the collection's title, so the Type column stayed empty.
+An update script renames the field in the installed blueprint and moves the stored values; Statamic runs it after
+`composer update`, or by hand with `php please updates:run 0.3.0 --package=byte5/doormat`. A site with its own
+frontend or published views reads `notice_type` instead of `type`.
+
 ## The notices
 
 An entry of the collection: an internal name (the same in every language), a heading, a short Bard
@@ -76,7 +84,7 @@ take-down time passes. The scheduler must run.
 GET /!/doormat/notices?site=<handle>
 ```
 
-answers `{"data": [...], "meta": {"view": "modal", "delay": 0, "preview": false}}`, each notice with `id`, `version`, `heading`, `type`, `text` (HTML), `button_label`,
+answers `{"data": [...], "meta": {"view": "modal", "delay": 0, "preview": false}}`, each notice with `id`, `version`, `heading`, `notice_type`, `text` (HTML), `button_label`,
 `button_url`, `pinned`, `dismissible`, `frequency`; the current site without the parameter, 404 for an
 unknown one, never cached. Keep the storage keys of the addon's script if you write your own, and see
 [Live preview](docs/frontend.md#live-preview) for the one parameter a site's script forwards.

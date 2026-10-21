@@ -39,7 +39,7 @@ GET /!/doormat/notices?site=de
             "id": "0490e8b8-…",
             "version": 1792594616,
             "heading": "Closed from 23 December to 3 January",
-            "type": "warning",
+            "notice_type": "warning",
             "text": "<p>Orders received by 18 December ship before Christmas.</p>",
             "button_label": "Contact us",
             "button_url": "/en/contact",
@@ -59,7 +59,7 @@ GET /!/doormat/notices?site=de
 | `id` | string | The entry's id |
 | `version` | int | A Unix timestamp of the last change - the notice's or its original's, whichever is later. Part of the dismissal key, so an edited notice returns. |
 | `heading` | string | The title visitors see; plain text, escape it |
-| `type` | `info` / `success` / `warning` / `error` | Colour and icon |
+| `notice_type` | `info` / `success` / `warning` / `error` | Colour and icon |
 | `text` | string | HTML from the editor (Bard); render it as HTML |
 | `button_label`, `button_url` | string or null | Both set, or both null |
 | `pinned` | bool | The order already puts it first |
@@ -166,7 +166,7 @@ interface Notice {
     id: string;
     version: number;
     heading: string;
-    type: 'info' | 'success' | 'warning' | 'error';
+    notice_type: 'info' | 'success' | 'warning' | 'error';
     text: string;
     button_label: string | null;
     button_url: string | null;
@@ -254,7 +254,7 @@ function onKeydown(event: KeyboardEvent) {
 
 <template>
     <div class="doormat">
-        <div v-for="notice in bars" :key="notice.id" :class="['doormat-bar', `doormat-bar--${notice.type}`]" role="region" :aria-label="notice.heading">
+        <div v-for="notice in bars" :key="notice.id" :class="['doormat-bar', `doormat-bar--${notice.notice_type}`]" role="region" :aria-label="notice.heading">
             <strong>{{ notice.heading }}</strong>
             <div v-html="notice.text"></div>
             <a v-if="notice.button_url" :href="notice.button_url">{{ notice.button_label }}</a>
@@ -263,7 +263,7 @@ function onKeydown(event: KeyboardEvent) {
 
         <template v-if="open && current">
             <div class="doormat-backdrop" @click="close"></div>
-            <dialog ref="dialog" :class="['doormat-dialog', `doormat-dialog--${current.type}`]" tabindex="-1" aria-label="Notices">
+            <dialog ref="dialog" :class="['doormat-dialog', `doormat-dialog--${current.notice_type}`]" tabindex="-1" aria-label="Notices">
                 <h2>{{ current.heading }}</h2>
                 <div v-html="current.text"></div>
                 <a v-if="current.button_url" :href="current.button_url">{{ current.button_label }}</a>

@@ -73,12 +73,12 @@ class LiveNotices extends Widget
         ]);
     }
 
-    /** @return array{title: string, type: string, pinned: bool, url: string} */
+    /** @return array{title: string, notice_type: string, pinned: bool, url: string} */
     private function notice(Entry $entry): array
     {
         return [
             'title' => (string) $entry->value('title'),
-            'type' => (string) __('doormat::notices.types.'.($entry->value('type') ?: 'info')),
+            'notice_type' => (string) __('doormat::notices.types.'.($entry->value('notice_type') ?: 'info')),
             'pinned' => (bool) $entry->value('pinned'),
             'url' => (string) $entry->editUrl(),
         ];

@@ -39,7 +39,7 @@ A notice is an entry of the collection. The blueprint `doormat:install` writes
 | `text` - Text | yes | The message, Bard: bold, italic, links, lists. Required. |
 | `button_link` - Link | yes | Optional: a page of the site or an address. No link, no button. |
 | `button_label` - Button text | yes | The button's label; required while a link is set. |
-| `type` - Type | no | `info`, `success`, `warning`, `error`: colour and icon. Default `info`. |
+| `notice_type` - Type | no | `info`, `success`, `warning`, `error`: colour and icon. Default `info`. Named `type` before 0.4, which Statamic's entry list cannot show; the update script moves it. |
 | `pinned` - Pinned | no | The pinned notice comes first. At most one notice may be pinned (`Byte5\Doormat\Rules\OnePinned`). |
 | `dismissible` - Dismissible | no | Default on. Off: the notice is a bar without a close button, until it is taken down. |
 | `frequency` - Shows again | no | For a closed notice: `once` (never again, default), `session` (in the next browser session), `always` (on every page). Shown while `dismissible` is on. |
