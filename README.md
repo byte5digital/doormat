@@ -76,9 +76,65 @@ take-down time passes. The scheduler must run.
 GET /!/doormat/notices?site=<handle>
 ```
 
-answers `{"data": [...], "meta": {"view": "modal", "delay": 0}}`, each notice with `id`, `version`, `heading`, `type`, `text` (HTML), `button_label`,
+answers `{"data": [...], "meta": {"view": "modal", "delay": 0, "preview": false}}`, each notice with `id`, `version`, `heading`, `type`, `text` (HTML), `button_label`,
 `button_url`, `pinned`, `dismissible`, `frequency`; the current site without the parameter, 404 for an
-unknown one, never cached. Keep the storage keys of the addon's script if you write your own.
+unknown one, never cached. Keep the storage keys of the addon's script if you write your own, and see
+[Live preview](#live-preview) for the one parameter a site's script forwards.
+
+## Live preview
+
+An editor editing a notice clicks **Live Preview** and sees it, unsaved changes included, on a page of
+the site as a visitor would: the dialog or the bar, in the notice's language. The page is the one
+picked on the settings page (its version in the notice's language), else that language's homepage.
+
+Notices have no URL, and Statamic offers live preview only to entries with one. The collection file
+`doormat:install` writes names the addon's entry class and a preview target:
+
+```yaml
+entry_class: Byte5\Doormat\Entries\Notice
+preview_targets:
+  -
+    label: 'Page with the notice'
+    url: '{doormat_preview_url}'
+    refresh: true
+```
+
+A site that installed the addon before adds these lines to `content/collections/doormat_notices.yaml` (`--force` would
+overwrite the blueprint as well) and run `php artisan statamic:stache:clear && php artisan statamic:stache:warm`. The entry class extends whatever
+entry class the site binds - the Stache's, the Eloquent driver's or a site's own - so the notices stay
+where they are. Statamic hands the page the preview as `?live-preview=…&token=…`; while that token is
+the live preview of a notice, the tag and the endpoint show that notice alone - whatever its dates, its
+published state or the master switch - and nothing else.
+
+**With the tag** there is nothing to do: on the preview page it renders the notice marked
+`data-doormat-preview`, and the script opens it at once - no delay - whatever the editor closed before,
+and closing it records nothing. Views published before keep working, but honour dismissals and the
+delay until they carry the attribute (see the shipped views). A pair's own markup asks
+`{{ doormat_notices:preview }}`.
+
+**With a frontend of its own**, the site's script forwards the page's `token` to the endpoint and, when
+`meta.preview` is true, shows the one notice it gets regardless of its own dismissals, without a delay
+(`meta.delay` is 0) and without recording the close:
+
+```js
+import { useDismissals } from '../../vendor/byte5/doormat/resources/ts'; // or the site's own
+
+const { isDismissed, remember } = useDismissals();
+const token = new URLSearchParams(window.location.search).get('token');
+const params = { site: 'en', ...(token ? { token } : {}) };
+
+const { data } = await axios.get('/!/doormat/notices', { params });
+const preview = data.meta.preview;
+
+const notices = preview ? data.data : data.data.filter((notice) => !isDismissed(notice));
+// show them; on close: if (!preview) remember(notice)
+```
+
+The endpoint also reads Statamic's `X-Statamic-Token` header. A missing, expired or unrelated token (one
+of another entry) changes nothing: the visitor's notices as always. Where the application limits the
+classes a cached value may unserialize into (`cache.serializable_classes`), the addon adds its entry
+class, as Statamic adds its own; a site on the Eloquent driver may need the driver's entry and model
+classes there too, for live preview of any entry.
 
 ## In the control panel
 
@@ -89,7 +145,8 @@ unknown one, never cached. Keep the storage keys of the addon's script if you wr
   language.
 - **The settings page** (Tools > Add-ons > Doormat; the `edit byte5/doormat settings` permission):
   a master switch that keeps every notice off the site, the presentation (dialog or bars; required while
-  the switch is on; until the settings are first saved the config file's `view` applies) and whether the dialog waits - "No wait" or "Wait" with a number of seconds - before it opens. Saving it flushes the static
+  the switch is on; until the settings are first saved the config file's `view` applies), whether the dialog waits - "No wait" or "Wait" with a number of seconds - before it opens,
+  and the page a notice's live preview opens on (empty: the homepage). Saving it flushes the static
   cache. The endpoint hands the presentation and the delay to a site's own script as `meta`.
 
 ## Dashboard widget
