@@ -13,7 +13,11 @@ a changed phone number, a warning about delays - that visitors see when they ope
 ```bash
 composer require byte5/doormat
 php please doormat:install
+php artisan vendor:publish --tag=doormat --force
 ```
+
+The last line publishes the control panel's script to `public/vendor/doormat/build`; run it again after every
+update (a site that commits its published assets commits that folder).
 
 `doormat:install` writes the notices collection (`content/collections/doormat_notices.yaml`) and its
 blueprint (`resources/blueprints/collections/doormat_notices/notice.yaml`) into the folders the site
@@ -78,12 +82,12 @@ unknown one, never cached. Keep the storage keys of the addon's script if you wr
   language.
 - **The settings page** (Tools > Addons > Doormat, or the `edit byte5/doormat settings` permission):
   a master switch that keeps every notice off the site, the presentation (dialog or bars; empty means
-  the config file decides) and a delay in seconds before the dialog opens. Saving it flushes the static
+  the config file decides) and whether the dialog waits - "No wait" or "Wait" with a number of seconds - before it opens. Saving it flushes the static
   cache. The endpoint hands the presentation and the delay to a site's own script as `meta`.
 
 ## Dashboard widget
 
-A "Doormat" card listing, per language, the notices live right now - or "No Doormat notices active"
+A "Doormat" card, built on Statamic's own widget, listing, per language, the notices live right now - or "No Doormat notices active"
 when none is. It notes when the master switch is off, and shows only to users who may view the
 notices. Add it in `config/statamic/cp.php`:
 
@@ -119,7 +123,7 @@ composer rector       # apply Rector's changes
 npm install
 npm test              # Vitest: the composables and the dialog
 npm run typecheck
-npm run build         # compile resources/ts to resources/dist/doormat.js - commit the result
+npm run build         # the visitor script (esbuild) and the control panel bundle (Vite) into resources/dist - commit the result
 ```
 
 The tests run on Orchestra Testbench with the Stache, two sites and the addon's own blueprint. GitHub

@@ -15,6 +15,13 @@ use Statamic\Providers\AddonServiceProvider;
 
 class ServiceProvider extends AddonServiceProvider
 {
+    // The control panel bundle: the dashboard widget on Statamic's UI kit (npm run build:cp).
+    protected $vite = [
+        'input' => ['resources/js/cp.js'],
+        'publicDirectory' => 'resources/dist',
+        'hotFile' => __DIR__.'/../resources/dist/hot',
+    ];
+
     // A notice's change flushes the static cache the notices render into.
     protected $listen = [
         EntrySaved::class => [FlushStaticCache::class],

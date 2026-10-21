@@ -8,3 +8,4 @@ composer.lock
 .idea
 /docs
 /node_modules
+/resources/dist/hot
