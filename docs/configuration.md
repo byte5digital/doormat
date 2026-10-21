@@ -23,8 +23,9 @@ Control panel: **Tools > Add-ons > Doormat**. Who may open it: users with the pe
 | `view` - Presentation | `modal` (Dialog) / `notice` (Bars) | How the notices a visitor may close are shown. Required while `enabled` is on. Notices that cannot be closed are always bars. |
 | `wait` - Delay | `no_wait` (default) / `wait` | Whether the dialog opens with the page or waits. |
 | `delay` - Seconds | 1-60, default 3 | Shown and checked only while `wait` is `wait`: how many seconds the dialog waits after the page has loaded. |
+| `preview_page` - Preview page | a page, or empty | The page a notice's [live preview](frontend.md#live-preview) opens on, in the notice's language. Empty, or where that page is missing or unpublished in the language: the homepage. |
 
-In code: `Byte5\Doormat\Settings::enabled()`, `::view()`, `::delay()` (0 while `no_wait`).
+In code: `Byte5\Doormat\Settings::enabled()`, `::view()`, `::delay()` (0 while `no_wait`), `::previewPage()`.
 
 ## A notice
 
@@ -49,6 +50,25 @@ A notice is an entry of the collection. The blueprint `doormat:install` writes
 "Per language: no" means one value for every language, set on the notice's original (the site it was
 created in). A notice shows on the sites it has a published localization on.
 
+## The collection file
+
+`doormat:install` writes `content/collections/<collection>.yaml`. Besides Statamic's usual keys (dated,
+no route, no slugs, every site listed) it carries the two keys live preview needs:
+
+```yaml
+entry_class: Byte5\Doormat\Entries\Notice
+preview_targets:
+  -
+    label: 'Page with the notice'
+    url: '{doormat_preview_url}'
+    refresh: true
+```
+
+The entry class extends whatever entry class the site binds - the Stache's, the Eloquent driver's or a
+site's own - so the notices stay where they are stored. A site installed before 0.3 adds these keys by
+hand (`--force` would overwrite the blueprint too), then runs
+`php artisan statamic:stache:clear && php artisan statamic:stache:warm`.
+
 ## The tag
 
 `{{ doormat_notices }}` - put it right after `<body>`.
@@ -59,7 +79,8 @@ created in). A notice shows on the sites it has a published localization on.
 | `site` | the current site | A site handle: show another site's notices. |
 
 As a pair, `{{ doormat_notices }} … {{ /doormat_notices }}`, it loops the notices with the fields listed
-in [Frontend](frontend.md#the-notice-fields). `{{ doormat_notices:script }}` prints the script alone.
+in [Frontend](frontend.md#the-notice-fields). `{{ doormat_notices:script }}` prints the script alone,
+`{{ doormat_notices:preview }}` is true on a notice's live preview.
 
 ## The endpoint
 
@@ -68,6 +89,7 @@ in [Frontend](frontend.md#the-notice-fields). `{{ doormat_notices:script }}` pri
 | Query parameter | Default | What it does |
 |-----------------|---------|--------------|
 | `site` | the current site | A site handle; an unknown one answers 404. |
+| `token` | - | Statamic's live-preview token (also read from the `X-Statamic-Token` header): the previewed notice alone, see [Live preview](frontend.md#live-preview). |
 
 ## The dashboard widget
 
@@ -119,6 +141,13 @@ The package ships English. A site translates:
   confirmation and button), in its `lang/<locale>.json`, as for any other blueprint;
 - the strings under `doormat::notices` - the dialog's buttons and position text, the state and type names,
   the widget's texts - in `lang/vendor/doormat/<locale>/notices.php`.
+
+## The cache allow-list
+
+Where the application limits the classes a cached value may unserialize into
+(`cache.serializable_classes`), the addon adds its entry class there, as Statamic adds its own: live
+preview keeps the edited notice in the cache. A site on the Eloquent driver may need the driver's entry
+and model classes on the list too, for live preview of any entry.
 
 ## Static caching
 
