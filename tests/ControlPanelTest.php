@@ -118,6 +118,16 @@ class ControlPanelTest extends TestCase
         $fields->addValues(['wait' => 'wait', 'delay' => 0])->validator()->validate();
     }
 
+    public function test_the_presentation_is_required_while_notices_are_shown(): void
+    {
+        $fields = Addon::get('byte5/doormat')->settingsBlueprint()->fields();
+
+        $fields->addValues(['enabled' => false, 'view' => null, 'wait' => 'no_wait'])->validator()->validate();
+
+        $this->expectException(ValidationException::class);
+        $fields->addValues(['enabled' => true, 'view' => null, 'wait' => 'no_wait'])->validator()->validate();
+    }
+
     public function test_saving_the_settings_flushes_the_static_cache(): void
     {
         StaticCache::shouldReceive('flush')->once();

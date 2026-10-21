@@ -81,8 +81,8 @@ unknown one, never cached. Keep the storage keys of the addon's script if you wr
   closed it without editing its text. On the origin every language returns; on a localization, that
   language.
 - **The settings page** (Tools > Add-ons > Doormat; the `edit byte5/doormat settings` permission):
-  a master switch that keeps every notice off the site, the presentation (dialog or bars; empty means
-  the config file decides) and whether the dialog waits - "No wait" or "Wait" with a number of seconds - before it opens. Saving it flushes the static
+  a master switch that keeps every notice off the site, the presentation (dialog or bars; required while
+  the switch is on; until the settings are first saved the config file's `view` applies) and whether the dialog waits - "No wait" or "Wait" with a number of seconds - before it opens. Saving it flushes the static
   cache. The endpoint hands the presentation and the delay to a site's own script as `meta`.
 
 ## Dashboard widget

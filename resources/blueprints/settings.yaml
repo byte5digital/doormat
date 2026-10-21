@@ -16,10 +16,12 @@ tabs:
             field:
               type: button_group
               display: Presentation
-              instructions: 'How the notices a visitor may close are shown: in a dialog, or as bars at the top of the page. Notices that cannot be closed are always bars. Empty: the config file decides.'
+              instructions: 'How the notices a visitor may close are shown: in a dialog, or as bars at the top of the page. Notices that cannot be closed are always bars.'
               options:
                 modal: Dialog
                 notice: Bars
+              validate:
+                - required_if_accepted:enabled
           -
             handle: wait
             field:
