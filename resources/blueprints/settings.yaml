@@ -21,13 +21,28 @@ tabs:
                 modal: Dialog
                 notice: Bars
           -
+            handle: wait
+            field:
+              type: button_group
+              display: Delay
+              instructions: 'Whether the dialog opens as soon as the page has loaded, or waits a few seconds.'
+              options:
+                no_wait: 'No wait'
+                wait: Wait
+              default: no_wait
+          -
             handle: delay
             field:
               type: integer
-              display: 'Delay in seconds'
-              instructions: 'How long the dialog waits after the page has loaded. 0 opens it at once.'
-              default: 0
+              display: Seconds
+              instructions: 'How many seconds the dialog waits after the page has loaded.'
+              default: 3
+              if:
+                wait: 'equals wait'
               validate:
+                # The server does not know the field's condition: no seconds are checked while "No wait" is picked.
+                - 'exclude_unless:wait,wait'
+                - required
                 - integer
-                - 'min:0'
+                - 'min:1'
                 - 'max:60'
