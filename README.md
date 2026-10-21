@@ -54,8 +54,8 @@ the script reads (`data-doormat-*`); publish them to restyle:
 php artisan vendor:publish --tag=doormat-views
 ```
 
-The dialog opens with `show()`, under a consent banner's z-index (`--doormat-z-index`, 1000), never in
-the browser's top layer. The script is plain JavaScript inlined by the view, with
+The script is written in TypeScript as framework-free composables - `useDismissals()`, `useDialog()`, `useBars()` in `resources/ts` - and shipped compiled in `resources/dist/doormat.js`, so a site needs no build. A site with a build of its own can import them from the package's source (`vendor/byte5/doormat/resources/ts`) for its own markup. The dialog opens with `show()`, under a consent banner's z-index (`--doormat-z-index`, 1000), never in
+the browser's top layer. The view inlines it with
 `data-cookieconsent="ignore"`; dismissals are kept in `localStorage` / `sessionStorage` as
 `doormat:<id>:<version>`, so an edited notice returns.
 
@@ -85,6 +85,18 @@ unknown one, never cached. Keep the storage keys of the addon's script if you wr
   the config file decides) and a delay in seconds before the dialog opens. Saving it flushes the static
   cache. The endpoint hands the presentation and the delay to a site's own script as `meta`.
 
+## Dashboard widget
+
+A "Doormat" card listing, per language, the notices live right now - or "No Doormat notices active"
+when none is. It notes when the master switch is off, and shows only to users who may view the
+notices. Add it in `config/statamic/cp.php`:
+
+```php
+'widgets' => [
+    ['type' => 'doormat', 'width' => 50],
+],
+```
+
 ## Configuration
 
 ```bash
@@ -108,10 +120,15 @@ composer test
 composer lint         # Pint, Laravel preset
 composer stan         # Larastan, level 7
 composer rector       # apply Rector's changes
+npm install
+npm test              # Vitest: the composables and the dialog
+npm run typecheck
+npm run build         # compile resources/ts to resources/dist/doormat.js - commit the result
 ```
 
 The tests run on Orchestra Testbench with the Stache, two sites and the addon's own blueprint. GitHub
-Actions runs them on PHP 8.2 to 8.5 with Laravel 12 and 13, plus Pint, Larastan and Rector, for every
+Actions runs them on PHP 8.2 to 8.5 with Laravel 12 and 13, plus Pint, Larastan and Rector, and
+the TypeScript (typecheck, Vitest, and a check that the committed build matches the source), for every
 push and pull request. Rector skips the console command attributes, which need Laravel 13.
 
 Releases are made by release-please from the conventional commits on `main`: it keeps a release pull

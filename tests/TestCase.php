@@ -35,6 +35,7 @@ abstract class TestCase extends AddonTestCase
         parent::getEnvironmentSetUp($app);
 
         $app['config']->set('statamic.editions.pro', true);
+        $app['config']->set('statamic.system.multisite', true);
         $app['config']->set('app.timezone', 'Europe/Berlin');
     }
 
