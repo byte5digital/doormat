@@ -6,6 +6,8 @@ composer.lock
 !/tests/__fixtures__/dev-null/.gitkeep
 .DS_Store
 .idea
-/docs
+# The private design and plan documents; docs/ itself is the public reference.
+/docs/design
+/docs/plans
 /node_modules
 /resources/dist/hot

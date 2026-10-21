@@ -3,6 +3,13 @@
 Site notices for Statamic: a message editors switch on in the control panel - a holiday closure,
 a changed phone number, a warning about delays - that visitors see when they open the website.
 
+## Documentation
+
+- [Configuration](docs/configuration.md) - every setting: config file, settings page, the notice's fields,
+  the tag's and the widget's options, commands, publish tags, permissions, translations
+- [Frontend](docs/frontend.md) - the tag, the JSON endpoint, the dismissal rules, and building your own
+  Vue component
+
 ## Requirements
 
 - PHP 8.2+
