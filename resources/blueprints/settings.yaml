@@ -1,0 +1,33 @@
+tabs:
+  main:
+    display: Settings
+    sections:
+      -
+        fields:
+          -
+            handle: enabled
+            field:
+              type: toggle
+              display: 'Show notices'
+              instructions: 'Off, no notice reaches a visitor on any site, whatever is published. The notices stay as they are.'
+              default: true
+          -
+            handle: view
+            field:
+              type: button_group
+              display: Presentation
+              instructions: 'How the notices a visitor may close are shown: in a dialog, or as bars at the top of the page. Notices that cannot be closed are always bars. Empty: the config file decides.'
+              options:
+                modal: Dialog
+                notice: Bars
+          -
+            handle: delay
+            field:
+              type: integer
+              display: 'Delay in seconds'
+              instructions: 'How long the dialog waits after the page has loaded. 0 opens it at once.'
+              default: 0
+              validate:
+                - integer
+                - 'min:0'
+                - 'max:60'

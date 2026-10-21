@@ -4,6 +4,7 @@ namespace Byte5\Doormat\Tags;
 
 use Byte5\Doormat\NoticeData;
 use Byte5\Doormat\Notices;
+use Byte5\Doormat\Settings;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Facades\Site;
 use Statamic\Tags\Tags;
@@ -17,12 +18,10 @@ use Statamic\View\View;
  */
 class DoormatNotices extends Tags
 {
-    private const VIEWS = ['modal', 'notice'];
-
     /** @return string|list<array<string, mixed>>|null */
     public function index(): string|array|null
     {
-        $notices = $this->items((string) ($this->params->get('site') ?? Site::current()->handle()));
+        $notices = Settings::enabled() ? $this->items((string) ($this->params->get('site') ?? Site::current()->handle())) : [];
 
         if ($this->isPair) {
             return $notices ?: null;
@@ -32,8 +31,8 @@ class DoormatNotices extends Tags
             return '';
         }
 
-        $view = $this->params->get('view') ?? config('doormat.view', 'modal');
-        $view = in_array($view, self::VIEWS, true) ? $view : 'modal';
+        $view = $this->params->get('view') ?? Settings::view();
+        $view = in_array($view, Settings::VIEWS, true) ? $view : 'modal';
 
         $bars = '';
         if ($view === 'modal') {
@@ -58,7 +57,7 @@ class DoormatNotices extends Tags
             return $bars;
         }
 
-        $data = ['notices' => $notices, 'bars' => $bars, 'script' => $this->script()];
+        $data = ['notices' => $notices, 'bars' => $bars, 'script' => $this->script(), 'delay' => Settings::delay()];
 
         return View::make('doormat::'.$view, $data)->render();
     }

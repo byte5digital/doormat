@@ -19,6 +19,7 @@ tabs:
           -
             handle: heading
             field:
+              listable: hidden
               type: text
               display: Heading
               instructions: 'The title the visitor sees.'
@@ -28,6 +29,7 @@ tabs:
           -
             handle: text
             field:
+              listable: false
               type: bard
               display: Text
               instructions: 'The message. Keep it short: a notice is read in passing.'
@@ -49,6 +51,7 @@ tabs:
           -
             handle: button_link
             field:
+              listable: false
               type: link
               display: Link
               instructions: 'A page of this site or an address. Leave it empty for no button.'
@@ -56,6 +59,7 @@ tabs:
           -
             handle: button_label
             field:
+              listable: false
               type: text
               display: 'Button text'
               localizable: true
@@ -72,6 +76,7 @@ tabs:
           -
             handle: type
             field:
+              listable: true
               type: button_group
               display: Type
               instructions: 'Decides the colour and the icon.'
@@ -92,6 +97,7 @@ tabs:
           -
             handle: pinned
             field:
+              listable: true
               type: toggle
               display: Pinned
               instructions: 'The pinned notice comes first. Only one notice can be pinned at a time.'
@@ -103,6 +109,7 @@ tabs:
           -
             handle: dismissible
             field:
+              listable: hidden
               type: toggle
               display: Dismissible
               instructions: 'Off, the visitor cannot close the notice; it stays until it is taken down.'
@@ -112,6 +119,7 @@ tabs:
           -
             handle: frequency
             field:
+              listable: hidden
               type: select
               display: 'Shows again'
               instructions: 'How often a visitor who closed the notice sees it again.'
@@ -131,8 +139,17 @@ tabs:
       -
         fields:
           -
+            handle: state
+            field:
+              type: text
+              display: State
+              instructions: 'Draft, scheduled, live or taken down - worked out from the publish and take-down dates.'
+              visibility: computed
+              listable: true
+          -
             handle: date
             field:
+              listable: true
               type: date
               display: 'Publish date'
               instructions: 'The notice shows from this date and time; before it, it stays off the site.'
@@ -143,6 +160,7 @@ tabs:
           -
             handle: expires_at
             field:
+              listable: true
               type: date
               display: 'Take-down date'
               instructions: 'From this date and time the notice is gone. Leave it empty to take it down by hand.'

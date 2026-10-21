@@ -3,7 +3,10 @@
 namespace Byte5\Doormat;
 
 use Byte5\Doormat\Listeners\FlushStaticCache;
+use Byte5\Doormat\Listeners\FlushStaticCacheOnSettings;
 use Illuminate\Console\Scheduling\Schedule;
+use Statamic\Contracts\Entries\Entry;
+use Statamic\Events\AddonSettingsSaved;
 use Statamic\Events\EntryDeleted;
 use Statamic\Events\EntrySaved;
 use Statamic\Facades\Collection;
@@ -16,12 +19,16 @@ class ServiceProvider extends AddonServiceProvider
     protected $listen = [
         EntrySaved::class => [FlushStaticCache::class],
         EntryDeleted::class => [FlushStaticCache::class],
+        AddonSettingsSaved::class => [FlushStaticCacheOnSettings::class],
     ];
 
     public function bootAddon(): void
     {
         // The two views, to restyle or rewrite: php artisan vendor:publish --tag=doormat-views
         $this->publishes([__DIR__.'/../resources/views' => resource_path('views/vendor/doormat')], 'doormat-views');
+
+        // The list's State column: draft, scheduled, live or taken down, in the editor's language.
+        Collection::computed(Notices::collection(), 'state', fn (Entry $entry): string => __('doormat::notices.states.'.Notices::state($entry)));
 
         // Tools > Doormat leads to the notices; Statamic's collection permissions decide who sees it.
         // While the collection is not installed (php please doormat:install) there is nothing to link.

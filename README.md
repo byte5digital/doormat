@@ -69,9 +69,21 @@ take-down time passes. The scheduler must run.
 GET /!/doormat/notices?site=<handle>
 ```
 
-answers `{"data": [...]}` with `id`, `version`, `heading`, `type`, `text` (HTML), `button_label`,
+answers `{"data": [...], "meta": {"view": "modal", "delay": 0}}`, each notice with `id`, `version`, `heading`, `type`, `text` (HTML), `button_label`,
 `button_url`, `pinned`, `dismissible`, `frequency`; the current site without the parameter, 404 for an
 unknown one, never cached. Keep the storage keys of the addon's script if you write your own.
+
+## In the control panel
+
+- **The list** shows each notice's state - Draft, Scheduled, Live or Taken down, worked out from its
+  dates - with its type, publish and take-down date and whether it is pinned.
+- **Show again to everyone**, an action on a notice (or several), brings it back for the visitors who
+  closed it without editing its text. On the origin every language returns; on a localization, that
+  language.
+- **The settings page** (Tools > Addons > Doormat, or the `edit byte5/doormat settings` permission):
+  a master switch that keeps every notice off the site, the presentation (dialog or bars; empty means
+  the config file decides) and a delay in seconds before the dialog opens. Saving it flushes the static
+  cache. The endpoint hands the presentation and the delay to a site's own script as `meta`.
 
 ## Configuration
 
@@ -79,7 +91,7 @@ unknown one, never cached. Keep the storage keys of the addon's script if you wr
 php artisan vendor:publish --tag=doormat-config
 ```
 
-`collection` (default `doormat_notices`) and `view` (`modal` or `notice`).
+`collection` (default `doormat_notices`) and `view` (`modal` or `notice`; the settings page's choice wins).
 
 ## Translations
 

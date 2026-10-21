@@ -181,7 +181,6 @@
         });
         if (backdrop) {
             backdrop.addEventListener('click', close);
-            backdrop.hidden = false;
         }
         document.addEventListener('keydown', onKeydown);
 
@@ -193,9 +192,23 @@
 
         render();
         dialog.setAttribute('tabindex', '-1');
-        // Opened as a plain dialog, not in the browser's top layer: it stays under a consent banner's z-index and the page is not frozen.
-        dialog.show();
-        dialog.focus();
+
+        function open() {
+            if (backdrop) {
+                backdrop.hidden = false;
+            }
+            // Opened as a plain dialog, not in the browser's top layer: it stays under a consent banner's z-index and the page is not frozen.
+            dialog.show();
+            dialog.focus();
+        }
+
+        // The settings page's delay, in seconds.
+        var delay = parseInt(dialog.getAttribute('data-doormat-delay') || '0', 10);
+        if (delay > 0) {
+            window.setTimeout(open, delay * 1000);
+        } else {
+            open();
+        }
     }
 
     function start() {

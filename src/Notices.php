@@ -42,6 +42,23 @@ final class Notices
             ->values());
     }
 
+    /**
+     * Where a notice stands, for the control panel's list: `draft`, `scheduled` (published, its date
+     * ahead), `taken_down` (its take-down time passed) or `live`.
+     */
+    public static function state(EntryContract $entry): string
+    {
+        if (! $entry->published()) {
+            return 'draft';
+        }
+
+        if ($entry->date() !== null && $entry->date()->isFuture()) {
+            return 'scheduled';
+        }
+
+        return self::takenDown($entry) ? 'taken_down' : 'live';
+    }
+
     /** The one-value-for-every-site fields sit on the origin: value() follows it, get() would not. */
     private static function takenDown(EntryContract $entry): bool
     {
