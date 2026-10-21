@@ -11,16 +11,16 @@ use Illuminate\Support\Str;
 use Statamic\Contracts\Entries\Entry as EntryContract;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Blueprint;
-use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Site;
+use Statamic\Facades\Stache;
 use Statamic\Testing\AddonTestCase;
 use Statamic\Testing\Concerns\PreventsSavingStacheItemsToDisk;
 
 /**
  * A Statamic with two sites, German and English, and the notices collection with the
- * addon's own blueprint, written by Definitions into a temporary folder - the stub is
- * what every test runs against. Entries live in the Stache and are never written to disk.
+ * addon's own blueprint, both written by Definitions into a temporary folder - the stubs
+ * are what every test runs against. Entries live in the Stache and are never written to disk.
  */
 abstract class TestCase extends AddonTestCase
 {
@@ -53,14 +53,9 @@ abstract class TestCase extends AddonTestCase
             ->write(Notices::collection(), ['de', 'en'], false);
         Blueprint::setDirectory($this->definitions.'/blueprints');
 
-        Collection::make(Notices::collection())
-            ->title('Doormat notices')
-            ->sites(['de', 'en'])
-            ->dated(true)
-            ->pastDateBehavior('public')
-            ->futureDateBehavior('private')
-            ->requiresSlugs(false)
-            ->save();
+        // The collection as Statamic reads the stub's file: dates, sites, the entry class, the preview target.
+        $file = $this->definitions.'/collections/'.Notices::collection().'.yaml';
+        Stache::store('collections')->makeItemFromFile($file, (string) file_get_contents($file))->save();
 
         // Noon in the application's timezone: the dates an editor enters are read in it.
         Carbon::setTestNow(Carbon::parse('2026-10-21 12:00:00', 'Europe/Berlin'));

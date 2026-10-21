@@ -48,3 +48,15 @@ tabs:
                 - integer
                 - 'min:1'
                 - 'max:60'
+      -
+        display: 'Live preview'
+        fields:
+          -
+            handle: preview_page
+            field:
+              type: entries
+              display: 'Preview page'
+              instructions: 'The page a notice opens on when an editor clicks Live Preview, in the notice''s language. Empty, or where the page does not exist or is not published in that language: the homepage.'
+              max_items: 1
+              mode: default
+              create: false

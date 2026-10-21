@@ -2,6 +2,7 @@
 
 namespace Byte5\Doormat;
 
+use Byte5\Doormat\Entries\Notice;
 use Byte5\Doormat\Listeners\FlushStaticCache;
 use Byte5\Doormat\Listeners\FlushStaticCacheOnSettings;
 use Illuminate\Console\Scheduling\Schedule;
@@ -35,6 +36,22 @@ class ServiceProvider extends AddonServiceProvider
 
         // The list's State column: draft, scheduled, live or taken down, in the editor's language.
         Collection::computed(Notices::collection(), 'state', fn (Entry $entry): string => __('doormat::notices.states.'.Notices::state($entry)));
+
+        $this->allowNoticesInTheCache();
+    }
+
+    /**
+     * Live preview keeps the previewed entry in the cache. Where the application limits the classes
+     * a cached value may unserialize into, Statamic adds its own entry class; the notices' is added
+     * the same way, or a preview would read an incomplete object.
+     */
+    private function allowNoticesInTheCache(): void
+    {
+        $classes = config('cache.serializable_classes');
+
+        if (is_array($classes)) {
+            config(['cache.serializable_classes' => array_values(array_unique([...$classes, Notice::class]))]);
+        }
     }
 
     /** A publish or take-down time that passed flushes the static cache within the minute. */

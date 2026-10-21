@@ -2,6 +2,7 @@
 
 namespace Byte5\Doormat\Tests;
 
+use Byte5\Doormat\Entries\Notice;
 use Byte5\Doormat\Install\Definitions;
 use Illuminate\Filesystem\Filesystem;
 use Statamic\Facades\YAML;
@@ -51,6 +52,9 @@ class DefinitionsTest extends TestCase
         $this->assertSame('desc', $collection['sort_dir']);
         $this->assertSame(['seo' => false], $collection['inject']);
         $this->assertArrayNotHasKey('route', $collection);
+        // Live preview without a route: the entry class offers it, the target opens the preview page.
+        $this->assertSame(Notice::class, $collection['entry_class']);
+        $this->assertSame([['label' => 'Page with the notice', 'url' => '{doormat_preview_url}', 'refresh' => true]], $collection['preview_targets']);
 
         $blueprint = YAML::file($this->dir.'/blueprints/doormat_notices/notice.yaml')->parse();
         $this->assertSame('Notice', $blueprint['title']);

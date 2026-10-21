@@ -4,6 +4,7 @@ namespace Byte5\Doormat\Tags;
 
 use Byte5\Doormat\NoticeData;
 use Byte5\Doormat\Notices;
+use Byte5\Doormat\Preview;
 use Byte5\Doormat\Settings;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Facades\Site;
@@ -15,13 +16,24 @@ use Statamic\View\View;
  * view: `modal` - a dialog for the notices a visitor may close, bars for the rest -
  * or `notice` - bars only. Parameters: view="modal|notice", site="<handle>". As a pair
  * it loops the notices instead; {{ doormat_notices:script }} prints the script alone.
+ *
+ * In a notice's live preview (the page loaded with its token) it renders that notice
+ * alone, with the editor's unsaved changes, whatever its dates, its state or the master
+ * switch, marked `data-doormat-preview` so the script opens it at once and records no
+ * dismissal; {{ doormat_notices:preview }} tells a pair's own markup.
  */
 class DoormatNotices extends Tags
 {
     /** @return string|list<array<string, mixed>>|null */
     public function index(): string|array|null
     {
-        $notices = Settings::enabled() ? $this->items((string) ($this->params->get('site') ?? Site::current()->handle())) : [];
+        $preview = Preview::notice();
+
+        $notices = match (true) {
+            $preview instanceof Entry => [NoticeData::of($preview)],
+            Settings::enabled() => $this->items((string) ($this->params->get('site') ?? Site::current()->handle())),
+            default => [],
+        };
 
         if ($this->isPair) {
             return $notices ?: null;
@@ -44,6 +56,12 @@ class DoormatNotices extends Tags
         return $this->view($view, $notices, $bars);
     }
 
+    /** Whether this page is a notice's live preview: for a pair's own markup and script. */
+    public function preview(): bool
+    {
+        return Preview::notice() instanceof Entry;
+    }
+
     /** The script alone, for a site that writes the markup itself. */
     public function script(): string
     {
@@ -57,7 +75,8 @@ class DoormatNotices extends Tags
             return $bars;
         }
 
-        $data = ['notices' => $notices, 'bars' => $bars, 'script' => $this->script(), 'delay' => Settings::delay()];
+        $preview = $this->preview();
+        $data = ['notices' => $notices, 'bars' => $bars, 'script' => $this->script(), 'delay' => $preview ? 0 : Settings::delay(), 'preview' => $preview];
 
         return View::make('doormat::'.$view, $data)->render();
     }

@@ -6,7 +6,9 @@ use Statamic\Contracts\Entries\Entry;
 
 /**
  * A notice as the tag's views, the tag pair and the JSON endpoint see it: one shape,
- * so a site's own script and the addon's script read the same fields.
+ * so a site's own script and the addon's script read the same fields. A notice in live
+ * preview carries the editor's unsaved values as supplements, which win over the saved
+ * ones (augmentation reads them first by itself).
  */
 final class NoticeData
 {
@@ -14,20 +16,26 @@ final class NoticeData
     public static function of(Entry $entry): array
     {
         $url = (string) $entry->augmentedValue('button_link')->value();
-        $label = (string) $entry->value('button_label');
+        $label = (string) self::value($entry, 'button_label');
 
         return [
             'id' => $entry->id(),
             'version' => self::version($entry),
-            'heading' => (string) $entry->value('heading'),
-            'type' => $entry->value('type') ?: 'info',
+            'heading' => (string) self::value($entry, 'heading'),
+            'type' => self::value($entry, 'type') ?: 'info',
             'text' => (string) $entry->augmentedValue('text')->value(),
             'button_label' => $url !== '' && $label !== '' ? $label : null,
             'button_url' => $url !== '' && $label !== '' ? $url : null,
-            'pinned' => (bool) $entry->value('pinned'),
-            'dismissible' => (bool) ($entry->value('dismissible') ?? true),
-            'frequency' => $entry->value('frequency') ?: 'once',
+            'pinned' => (bool) self::value($entry, 'pinned'),
+            'dismissible' => (bool) (self::value($entry, 'dismissible') ?? true),
+            'frequency' => self::value($entry, 'frequency') ?: 'once',
         ];
+    }
+
+    /** The unsaved value of a notice in live preview, else the saved one (the origin's where the entry has none). */
+    private static function value(Entry $entry, string $key): mixed
+    {
+        return $entry->hasSupplement($key) ? $entry->getSupplement($key) : $entry->value($key);
     }
 
     /**

@@ -10,3 +10,11 @@ date_behavior:
   future: private
 inject:
   seo: false
+# A notice has no route; its entry class offers live preview anyway, on the page
+# the settings page picks (else the homepage) of the notice's site.
+entry_class: Byte5\Doormat\Entries\Notice
+preview_targets:
+  -
+    label: 'Page with the notice'
+    url: '{doormat_preview_url}'
+    refresh: true

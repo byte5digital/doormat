@@ -8,6 +8,8 @@ parameters:
     paths:
         - src/
         - routes/
+    bootstrapFiles:
+        - tests/phpstan/bootstrap.php
     ignoreErrors:
         # Statamic's contracts (Entry, QueryBuilder, ...) are empty marker interfaces; the methods the
         # facades hand out live on the implementations.

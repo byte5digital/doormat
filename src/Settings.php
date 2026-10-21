@@ -8,8 +8,8 @@ use Statamic\Facades\Addon;
 
 /**
  * The addon's settings page in the control panel (resources/blueprints/settings.yaml): a master
- * switch, how the notices are shown and how long the dialog waits. An unset presentation falls
- * back to the config file's.
+ * switch, how the notices are shown, how long the dialog waits and the page a notice's live preview
+ * opens on. An unset presentation falls back to the config file's.
  */
 final class Settings
 {
@@ -33,6 +33,18 @@ final class Settings
     public static function delay(): int
     {
         return self::get('wait') === 'wait' ? max(1, (int) self::get('delay', 1)) : 0;
+    }
+
+    /**
+     * The id of the page a notice's live preview opens on, or null for the homepage. The entries field
+     * keeps one id; a list (a field once configured for more) counts its first.
+     */
+    public static function previewPage(): ?string
+    {
+        $page = self::get('preview_page');
+        $page = is_array($page) ? reset($page) : $page;
+
+        return is_string($page) && $page !== '' ? $page : null;
     }
 
     private static function get(string $key, mixed $default = null): mixed
