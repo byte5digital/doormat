@@ -35,7 +35,7 @@ defineProps({
                                     <a class="title-index-field" :href="notice.url" v-text="notice.title" />
                                 </td>
                                 <td class="text-end text-xs whitespace-nowrap text-gray-600 dark:text-gray-400">
-                                    {{ notice.type }}<template v-if="notice.pinned"> · {{ texts.pinned }}</template>
+                                    {{ notice.notice_type }}<template v-if="notice.pinned"> · {{ texts.pinned }}</template>
                                 </td>
                             </tr>
                         </tbody>

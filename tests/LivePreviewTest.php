@@ -131,7 +131,7 @@ class LivePreviewTest extends TestCase
         $editor = tap(User::make()->email('editor@example.com')->makeSuper())->save();
 
         $response = $this->actingAs($editor)->postJson(cp_route('collections.entries.preview.edit', ['doormat_notices', $notice->id()]), [
-            'preview' => ['title' => 'Test notice', 'heading' => 'Unsaved', 'type' => 'warning'],
+            'preview' => ['title' => 'Test notice', 'heading' => 'Unsaved', 'notice_type' => 'warning'],
         ])->assertOk();
 
         $this->assertStringStartsWith('http://localhost?live-preview=', $response->json('url'));
@@ -141,7 +141,7 @@ class LivePreviewTest extends TestCase
             ->assertOk()
             ->assertJsonPath('meta.preview', true)
             ->assertJsonPath('data.0.heading', 'Unsaved')
-            ->assertJsonPath('data.0.type', 'warning');
+            ->assertJsonPath('data.0.notice_type', 'warning');
     }
 
     public function test_with_a_valid_token_the_endpoint_answers_the_previewed_notice_alone(): void

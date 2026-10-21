@@ -46,7 +46,7 @@ class WidgetTest extends TestCase
 
     public function test_it_lists_the_live_notices_per_language(): void
     {
-        $this->notice('de', ['title' => 'Betriebsferien', 'type' => 'warning', 'pinned' => true]);
+        $this->notice('de', ['title' => 'Betriebsferien', 'notice_type' => 'warning', 'pinned' => true]);
         $this->notice('de', ['title' => 'Entwurf'], null, false);
         $this->notice('de', ['title' => 'Geplant'], now()->addDay());
 
@@ -54,8 +54,8 @@ class WidgetTest extends TestCase
 
         $this->assertTrue($props['any']);
         $this->assertSame(['Deutsch', 'English'], array_column($props['sites'], 'name'));
-        $this->assertSame([['title' => 'Betriebsferien', 'type' => 'Warning', 'pinned' => true]], array_map(
-            fn (array $notice) => array_intersect_key($notice, array_flip(['title', 'type', 'pinned'])),
+        $this->assertSame([['title' => 'Betriebsferien', 'notice_type' => 'Warning', 'pinned' => true]], array_map(
+            fn (array $notice) => array_intersect_key($notice, array_flip(['title', 'notice_type', 'pinned'])),
             $props['sites'][0]['notices']
         ));
         $this->assertSame([], $props['sites'][1]['notices']);

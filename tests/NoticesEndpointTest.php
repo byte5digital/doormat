@@ -12,12 +12,12 @@ use Statamic\Facades\Site;
  */
 class NoticesEndpointTest extends TestCase
 {
-    private const FIELDS = ['id', 'version', 'heading', 'type', 'text', 'button_label', 'button_url', 'pinned', 'dismissible', 'frequency'];
+    private const FIELDS = ['id', 'version', 'heading', 'notice_type', 'text', 'button_label', 'button_url', 'pinned', 'dismissible', 'frequency'];
 
     public function test_the_endpoint_answers_the_active_notices_of_the_asked_site(): void
     {
         $this->notice('de', ['heading' => 'Older'], now()->subDays(2));
-        $newer = $this->notice('de', ['heading' => 'Newer', 'type' => 'warning', 'button_label' => 'More', 'button_link' => 'https://example.com'], now()->subDay());
+        $newer = $this->notice('de', ['heading' => 'Newer', 'notice_type' => 'warning', 'button_label' => 'More', 'button_link' => 'https://example.com'], now()->subDay());
         $this->notice('en');
 
         $this->getJson('/!/doormat/notices?site=de')
@@ -25,7 +25,7 @@ class NoticesEndpointTest extends TestCase
             ->assertHeader('Cache-Control', 'no-store, private')
             ->assertJsonCount(2, 'data')
             ->assertJsonPath('data.0.heading', 'Newer')
-            ->assertJsonPath('data.0.type', 'warning')
+            ->assertJsonPath('data.0.notice_type', 'warning')
             ->assertJsonPath('data.0.button_url', 'https://example.com')
             ->assertJsonPath('data.0.button_label', 'More')
             ->assertJsonPath('data.0.id', $newer->id())

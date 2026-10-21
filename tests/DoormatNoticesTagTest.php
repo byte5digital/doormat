@@ -39,7 +39,7 @@ class DoormatNoticesTagTest extends TestCase
     public function test_the_modal_view_is_the_default_and_carries_the_data_attributes(): void
     {
         $notice = $this->notice('de', [
-            'heading' => 'Closed on Friday', 'type' => 'warning',
+            'heading' => 'Closed on Friday', 'notice_type' => 'warning',
             'text' => [['type' => 'paragraph', 'content' => [['type' => 'text', 'text' => 'We are closed.']]]],
         ]);
 
@@ -58,7 +58,7 @@ class DoormatNoticesTagTest extends TestCase
 
     public function test_the_notice_view_renders_bars_by_config_or_parameter(): void
     {
-        $this->notice('de', ['type' => 'info']);
+        $this->notice('de', ['notice_type' => 'info']);
 
         config(['doormat.view' => 'notice']);
         $html = $this->render('{{ doormat_notices }}');
@@ -166,7 +166,7 @@ class DoormatNoticesTagTest extends TestCase
         $this->notice('de', ['heading' => 'One'], now()->subDays(2));
         $this->notice('de', ['heading' => 'Two'], now()->subDay());
 
-        $this->assertSame('[Two|info|once][One|info|once]', $this->render('{{ doormat_notices }}[{{ heading }}|{{ type }}|{{ frequency }}]{{ /doormat_notices }}'));
+        $this->assertSame('[Two|info|once][One|info|once]', $this->render('{{ doormat_notices }}[{{ heading }}|{{ notice_type }}|{{ frequency }}]{{ /doormat_notices }}'));
 
         $script = $this->render('{{ doormat_notices:script }}');
         $this->assertStringStartsWith('<script data-cookieconsent="ignore">', $script);

@@ -14,11 +14,11 @@
         <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg>
     </button>
     {{ notices }}
-    <section class="doormat-notice doormat-notice--{{ type | sanitize }}" data-doormat-notice data-doormat-id="{{ id | sanitize }}" data-doormat-version="{{ version }}" data-doormat-frequency="{{ frequency | sanitize }}" data-doormat-dismissible="{{ if dismissible }}true{{ else }}false{{ /if }}"{{ if preview }} data-doormat-preview{{ /if }} hidden>
+    <section class="doormat-notice doormat-notice--{{ notice_type | sanitize }}" data-doormat-notice data-doormat-id="{{ id | sanitize }}" data-doormat-version="{{ version }}" data-doormat-frequency="{{ frequency | sanitize }}" data-doormat-dismissible="{{ if dismissible }}true{{ else }}false{{ /if }}"{{ if preview }} data-doormat-preview{{ /if }} hidden>
         <div class="doormat-notice__icon">
-            <svg aria-hidden="true" width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="{{ if type == 'warning' }}M12 3.5L2.5 20h19z M12 10v4.5 M12 17.5h.01{{ elseif type == 'error' }}M8.2 3h7.6L21 8.2v7.6L15.8 21H8.2L3 15.8V8.2z M9 9l6 6 M15 9l-6 6{{ elseif type == 'success' }}M12 3a9 9 0 1 0 0 18a9 9 0 1 0 0-18z M8 12.5l2.7 2.7L16 9.5{{ else }}M12 3a9 9 0 1 0 0 18a9 9 0 1 0 0-18z M12 16v-5 M12 8h.01{{ /if }}"></path></svg>
+            <svg aria-hidden="true" width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="{{ if notice_type == 'warning' }}M12 3.5L2.5 20h19z M12 10v4.5 M12 17.5h.01{{ elseif notice_type == 'error' }}M8.2 3h7.6L21 8.2v7.6L15.8 21H8.2L3 15.8V8.2z M9 9l6 6 M15 9l-6 6{{ elseif notice_type == 'success' }}M12 3a9 9 0 1 0 0 18a9 9 0 1 0 0-18z M8 12.5l2.7 2.7L16 9.5{{ else }}M12 3a9 9 0 1 0 0 18a9 9 0 1 0 0-18z M12 16v-5 M12 8h.01{{ /if }}"></path></svg>
         </div>
-        <div class="doormat-notice__type">{{ trans :key="'doormat::notices.types.' + type" }}</div>
+        <div class="doormat-notice__type">{{ trans :key="'doormat::notices.types.' + notice_type" }}</div>
         <h2 class="doormat-notice__heading">{{ heading | sanitize }}</h2>
         <div class="doormat-notice__text">{{ text }}</div>
         {{ if button_url }}<a class="doormat-notice__button" href="{{ button_url | sanitize }}">{{ button_label | sanitize }}</a>{{ /if }}

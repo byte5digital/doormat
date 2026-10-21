@@ -22,7 +22,7 @@ final class NoticeData
             'id' => $entry->id(),
             'version' => self::version($entry),
             'heading' => (string) self::value($entry, 'heading'),
-            'type' => self::value($entry, 'type') ?: 'info',
+            'notice_type' => self::value($entry, 'notice_type') ?: 'info',
             'text' => (string) $entry->augmentedValue('text')->value(),
             'button_label' => $url !== '' && $label !== '' ? $label : null,
             'button_url' => $url !== '' && $label !== '' ? $url : null,
@@ -39,7 +39,7 @@ final class NoticeData
     }
 
     /**
-     * The later of the entry's and its origin's last change: the type, the dates and often
+     * The later of the entry's and its origin's last change: the notice type, the dates and often
      * the texts live on the origin, and saving it does not touch the localizations' rows.
      */
     private static function version(Entry $entry): int
